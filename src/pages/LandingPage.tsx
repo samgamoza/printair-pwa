@@ -5,6 +5,7 @@ import { MarketingHeader, MarketingFooter } from '@/components/marketing/Chrome'
 import { ProjectBuilder } from '@/components/ProjectBuilder';
 import { Assistant } from '@/components/Assistant';
 import { Button } from '@/components/ui/Button';
+import { Rail } from '@/components/ui/Rail';
 import { ColorBar, CropMarks, RegistrationMark } from '@/components/ui/Marks';
 import { InstallBanner } from '@/pwa/InstallPrompt';
 import { useAuth } from '@/contexts/AuthContext';
@@ -168,11 +169,15 @@ export default function LandingPage() {
 
         {/* ---------- Stories ---------- */}
         <section id="inspiration" className="scroll-mt-20 py-14 lg:py-20">
-          <div className="mx-auto max-w-6xl px-5 sm:px-8">
-            <p className="slug text-grape-600">Inspiration</p>
-            <h2 className="mt-2 text-4xl text-ink-950 sm:text-5xl">Made with PrintAir</h2>
-          </div>
-          <div className="no-scrollbar mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-4 sm:px-8 lg:mx-auto lg:max-w-6xl">
+          <Rail
+            label="customer stories"
+            header={
+              <>
+                <p className="slug text-grape-600">Inspiration</p>
+                <h2 className="mt-2 text-4xl text-ink-950 sm:text-5xl">Made with PrintAir</h2>
+              </>
+            }
+          >
             {INSPIRATION_ITEMS.map((item, i) => (
               <article
                 key={item.title}
@@ -210,7 +215,7 @@ export default function LandingPage() {
                 </div>
               </article>
             ))}
-          </div>
+          </Rail>
         </section>
 
         {/* ---------- Two doors ---------- */}
