@@ -6,6 +6,8 @@ The PWA looks nothing like the original site, but does exactly what it does. Thi
 
 A print marketplace, dressed in the four inks a press runs: **cyan, magenta, yellow, key (black)**. Neutrals are `ink`; surfaces are `paper`. Two overprints get names because they are used alone: `grape` (cyan over magenta) and `leaf` (cyan over yellow). Decoration comes from the pressroom: halftone dot fields, registration marks, the colour control strip, crop marks. Headlines are Bricolage Grotesque (bold, slightly condensed); everything else is Figtree.
 
+**The logo is not part of that palette, on purpose.** It is PrintAir's own navy-and-orange paper plane, used exactly as supplied (`brand/printair-mark-source.png` → `public/logo-mark.png` via `npm run icons`). Don't redraw, recolour or crop it. Its body is navy, so it always sits on a white tile (`LogoMark`), including on the ink side rail. "Air" in the wordmark takes the logo's orange; orange is used nowhere else in the interface.
+
 Tone: friendly, confident, plain-spoken. Big type, big touch targets, lots of colour in tiles and badges, black for primary actions, magenta for "create" and for the moments that matter.
 
 ## Non-negotiables
@@ -50,7 +52,7 @@ Animations: `animate-fade-up`, `animate-fade-in`, `animate-pop-in`, `animate-pul
 | `PageHeader`, `FilterTabs`, `Badge`, `Stars`, `StarInput`, `Avatar`, `FileRow`, `Stat` from `ui/bits` | `PageHeader {title, subtitle, back:{to,label}, action, badge}`. `FileRow {name, size|meta, onDownload, onRemove, busy}`. `Avatar {name, square}` draws initials on an ink. |
 | `PageLoader`, `SkeletonList`, `EmptyState`, `ErrorState`, `Banner`, `FormError` from `ui/states` | `EmptyState {icon, title, body, action, tone}`. `ErrorState {title, message, onRetry}`. `FormError` renders nothing when empty. |
 | `Timeline` from `ui/Timeline` | Used through `OrderTimeline` / `DesignOrderTimeline`. |
-| `Logo`, `LogoMark`, `PlaneGlyph`, `InkLoader`, `ColorBar`, `RegistrationMark`, `CropMarks`, `Halftone` from `ui/Marks` | Brand marks and ornaments. |
+| `Logo`, `LogoMark`, `PlaneGlyph`, `InkLoader`, `ColorBar`, `RegistrationMark`, `CropMarks`, `Halftone` from `ui/Marks` | The supplied logo (`PlaneGlyph` is the bare mark, `LogoMark` puts it on its white tile, `Logo` adds the wordmark) and the press ornaments. |
 | Status badges from `components/dashboard/StatusBadge` | `ProjectStatusBadge`, `OrderStatusBadge`, `QuoteStatusBadge`, `OpportunityStatusBadge`, `DesignRequestStatusBadge`, `DesignOrderStatusBadge`, `DesignProposalStatusBadge`, `DesignOpportunityStatusBadge`, `AccountStatusBadge`. |
 | `formatDate`, `formatDateTime`, `formatBytes`, `peso` from `lib/format`; `formatPHP` from `lib/pricing` | `peso()` for list prices, `formatPHP()` (with centavos) for amounts being charged. |
 

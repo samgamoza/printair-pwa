@@ -1,39 +1,44 @@
 /**
  * Brand marks and print-shop ornaments.
  *
- * Everything here is drawn in code so it stays crisp at any size and works
- * offline. The plane keeps PrintAir's paper-plane idea but is rebuilt from
- * the process inks: a cyan wing, a magenta wing, and the fold where they
- * "overprint" into grape, trailed by two yellow speed marks.
+ * The logo is PrintAir's own artwork, used exactly as supplied: the navy and
+ * orange paper plane with its speed lines. It lives in `public/logo-mark.png`
+ * (cut out from `brand/printair-mark-source.png` by `npm run icons`), so the
+ * same file feeds the app, the favicon and the home-screen icons. Because the
+ * plane's body is navy, the mark always sits on a white tile — on the ink side
+ * rail or a dark sheet it would otherwise disappear.
+ *
+ * The ornaments further down are drawn in code so they stay crisp at any size.
  */
 
-const PLANE_PATHS = {
-  upper: '44,4 3,21 19,28',
-  lower: '44,4 19,28 27,45',
-  fold: '19,28 18,41 24.6,34.2',
-};
+/** The orange in the supplied logo, used for "Air" in the wordmark so the lockup reads as one piece. */
+const LOGO_ORANGE = '#f97a1f';
 
 export function PlaneGlyph({ className = 'h-7 w-7' }: { className?: string }) {
   return (
-    <svg viewBox="0 0 48 48" className={className} aria-hidden="true">
-      <polygon points={PLANE_PATHS.upper} fill="#22bdf0" />
-      <polygon points={PLANE_PATHS.lower} fill="#ee2a8b" />
-      <polygon points={PLANE_PATHS.fold} fill="#5d38dc" />
-      <rect x="2" y="33.5" width="10" height="3.6" rx="1.8" fill="#ffd21f" transform="rotate(-38 7 35.3)" />
-      <rect x="7" y="40" width="7" height="3.6" rx="1.8" fill="#ffd21f" transform="rotate(-38 10.5 41.8)" />
-    </svg>
+    <img
+      src="/logo-mark.png"
+      alt=""
+      aria-hidden="true"
+      draggable={false}
+      decoding="async"
+      className={`select-none object-contain ${className}`}
+    />
   );
 }
 
-/** The plane on an ink tile — the app icon. `tone="light"` flips the tile to white for dark backgrounds. */
+/**
+ * The plane on its white tile — the app icon. `tone` is kept so callers don't
+ * change; on dark backgrounds the tile drops its border, that's all.
+ */
 export function LogoMark({ className = 'h-10 w-10', tone = 'dark' }: { className?: string; tone?: 'dark' | 'light' }) {
   return (
     <span
-      className={`inline-flex shrink-0 items-center justify-center rounded-[28%] shadow-soft ${
-        tone === 'light' ? 'bg-white' : 'bg-ink-950'
+      className={`inline-flex shrink-0 items-center justify-center rounded-[28%] bg-white shadow-soft ${
+        tone === 'light' ? '' : 'ring-1 ring-ink-950/10'
       } ${className}`}
     >
-      <PlaneGlyph className="h-[68%] w-[68%]" />
+      <PlaneGlyph className="h-[78%] w-[78%]" />
     </span>
   );
 }
@@ -56,7 +61,7 @@ export function Logo({
         }`}
         style={{ fontVariationSettings: "'wdth' 88" }}
       >
-        Print<span className="text-magenta-500">Air</span>
+        Print<span style={{ color: LOGO_ORANGE }}>Air</span>
       </span>
     </span>
   );

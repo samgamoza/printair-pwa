@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => ({
       // 'prompt': a new version waits for the person to tap Refresh (see src/pwa/UpdateToast.tsx)
       // rather than reloading underneath them.
       registerType: 'prompt',
-      includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
+      includeAssets: ['logo-mark.png', 'apple-touch-icon.png'],
       manifest: {
         id: '/app',
         name: 'PrintAir — Print, delivered',

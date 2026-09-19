@@ -80,7 +80,7 @@ Edge function CORS is already `*`, so the assistant and checkout calls work from
 - **Honest offline behaviour.** The app shell, fonts and icons are cached so the app always opens. Supabase data, sign-in, file downloads, edge functions and PayMongo checkout are **never** cached (`vite.config.ts`, matched by path as well as host), because a stale quote or order status is worse than an error. Offline, screens say so and offer a retry.
 - **Updates ask first.** A new version downloads in the background and shows "A new version of PrintAir is ready — Refresh", rather than reloading under someone halfway through a quote. An open app checks for updates hourly.
 
-Regenerate icons after changing the mark with `npm run icons`.
+The logo is the supplied artwork in `brand/printair-mark-source.png`. `npm run icons` cuts it out onto a transparent background (`public/logo-mark.png`, used inside the app) and makes every icon size from it. Replace that one file and re-run to change the logo everywhere.
 
 ## Where things are
 
