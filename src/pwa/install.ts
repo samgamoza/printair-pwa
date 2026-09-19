@@ -8,7 +8,14 @@ import { useEffect, useState, useSyncExternalStore } from 'react';
  * load, before any component has mounted, and shared through a tiny store.
  * Safari on iPhone and iPad never fires it; there the only route is
  * Share → Add to Home Screen, so the UI shows instructions instead.
+ *
+ * The offer to install is never hidden just because the browser stayed quiet
+ * (Firefox, desktop Safari, a browser that was asked before, a dev server with
+ * no service worker). In those cases `how` says which written steps to show.
  */
+
+/** Which route to installing this browser has. */
+export type InstallRoute = 'prompt' | 'ios' | 'android' | 'desktop';
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -45,11 +52,14 @@ export function isStandalone(): boolean {
   );
 }
 
-function isIosSafari(): boolean {
+function isIos(): boolean {
   if (typeof navigator === 'undefined') return false;
   const ua = navigator.userAgent;
-  const ios = /iPad|iPhone|iPod/.test(ua) || (ua.includes('Macintosh') && navigator.maxTouchPoints > 1);
-  return ios && !/CriOS|FxiOS|EdgiOS/.test(ua);
+  return /iPad|iPhone|iPod/.test(ua) || (ua.includes('Macintosh') && navigator.maxTouchPoints > 1);
+}
+
+function isAndroid(): boolean {
+  return typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent);
 }
 
 const DISMISS_KEY = 'printair.install.dismissed';
@@ -75,14 +85,15 @@ export function useInstall() {
     return () => window.removeEventListener('appinstalled', onInstalled);
   }, []);
 
-  const ios = isIosSafari();
+  const how: InstallRoute = canPrompt ? 'prompt' : isIos() ? 'ios' : isAndroid() ? 'android' : 'desktop';
 
   return {
-    /** True when there is something useful to offer: a native prompt, or iOS instructions. */
-    available: !installed && (canPrompt || ios),
-    /** True when the banner should show unprompted (the account menu ignores this). */
-    shouldNudge: !installed && !dismissed && (canPrompt || ios),
-    needsIosSteps: ios && !canPrompt,
+    /** True whenever this isn't already the installed app. There is always a route: a prompt, or written steps. */
+    available: !installed,
+    /** True when the banner should show unprompted (the header, footer and account menu ignore this). */
+    shouldNudge: !installed && !dismissed,
+    /** `prompt` means `install()` will open the browser's own dialog; anything else needs the written steps. */
+    how,
     installed,
     async install(): Promise<boolean> {
       if (!deferred) return false;

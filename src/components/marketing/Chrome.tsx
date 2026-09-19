@@ -7,6 +7,7 @@ import { Logo, ColorBar } from '@/components/ui/Marks';
 import { Avatar } from '@/components/ui/bits';
 import { Button } from '@/components/ui/Button';
 import { AccountSheet } from '@/components/shell/AccountSheet';
+import { GetAppButton } from '@/pwa/InstallPrompt';
 
 /** Top bar for the two welcome pages. */
 export function MarketingHeader() {
@@ -28,6 +29,7 @@ export function MarketingHeader() {
             <Link to="/designers" className="rounded-full px-4 py-2 text-sm font-bold text-ink-600 hover:bg-ink-100 hover:text-ink-950">
               Designers
             </Link>
+            <GetAppButton className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold text-magenta-700 hover:bg-magenta-50" />
           </nav>
           {session && profile ? (
             <>
@@ -86,6 +88,7 @@ export function MarketingFooter() {
             <a href="/#how" className={link}>
               How it works
             </a>
+            <GetAppButton className={`${link} flex items-center gap-2 text-left`} />
           </div>
         </div>
         <div>

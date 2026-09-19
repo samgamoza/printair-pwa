@@ -9,7 +9,7 @@ import { Sheet } from '@/components/ui/Sheet';
 import { Avatar, Badge } from '@/components/ui/bits';
 import { useDialogs } from '@/components/ui/dialogs';
 import { useInstall } from '@/pwa/install';
-import { IosInstallSheet } from '@/pwa/InstallPrompt';
+import { InstallSheet } from '@/pwa/InstallPrompt';
 
 const ROLE_NAME: Record<string, string> = {
   customer: 'Customer',
@@ -59,7 +59,7 @@ function Row({
 export function AccountSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { session, profile, openSignIn, openJoinPartner, openJoinDesigner, signOut } = useAuth();
   const { toast } = useDialogs();
-  const { available, needsIosSteps, install } = useInstall();
+  const { available, how, install } = useInstall();
   const navigate = useNavigate();
   const [iosOpen, setIosOpen] = useState(false);
   const [resetSent, setResetSent] = useState(false);
@@ -161,8 +161,8 @@ export function AccountSheet({ open, onClose }: { open: boolean; onClose: () => 
                 label="Install the app"
                 detail="Add PrintAir to your home screen"
                 onClick={() => {
-                  if (needsIosSteps) setIosOpen(true);
-                  else void install();
+                  if (how === 'prompt') void install();
+                  else setIosOpen(true);
                 }}
               />
             )}
@@ -182,7 +182,7 @@ export function AccountSheet({ open, onClose }: { open: boolean; onClose: () => 
           </div>
         </div>
       </Sheet>
-      <IosInstallSheet open={iosOpen} onClose={() => setIosOpen(false)} />
+      <InstallSheet open={iosOpen} onClose={() => setIosOpen(false)} />
     </>
   );
 }

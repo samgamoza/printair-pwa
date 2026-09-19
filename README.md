@@ -74,7 +74,7 @@ Edge function CORS is already `*`, so the assistant and checkout calls work from
 
 ## What makes it an app
 
-- **Installable.** Web manifest, full icon set (standard, maskable, Apple touch), three home-screen shortcuts. An install banner appears where the browser allows it; on iPhone and iPad it shows the two Share-sheet steps instead, because Safari offers no install button. The option also lives permanently in the account menu.
+- **Installable.** Web manifest, full icon set (standard, maskable, Apple touch), three home-screen shortcuts. "Get the app" is always on show — in the welcome page's header and footer, as a banner, and in the account menu — and hides itself only inside the installed app. Where the browser offers an install dialog (Chrome, Edge, Samsung Internet) it opens that; everywhere else it shows the two steps for that device (iPhone and iPad: Share → Add to Home Screen), because those browsers give a site no install button. On a dev server installing is off (no service worker), and the sheet says so.
 - **Opens where you work.** The installed app starts at `/app`, which sends a signed-in person straight to their own workspace and everyone else to the welcome screen with sign-in open.
 - **Works without a browser around it.** Every screen has its own way back, safe-area padding for the notch and home indicator, and no reliance on browser dialogs.
 - **Honest offline behaviour.** The app shell, fonts and icons are cached so the app always opens. Supabase data, sign-in, file downloads, edge functions and PayMongo checkout are **never** cached (`vite.config.ts`, matched by path as well as host), because a stale quote or order status is worse than an error. Offline, screens say so and offer a retry.
