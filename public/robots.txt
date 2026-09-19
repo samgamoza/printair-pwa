@@ -1,0 +1,12 @@
+# Public pages are the welcome pages and the two directories.
+# Everything behind sign-in is private and has nothing to index.
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /partner/
+Disallow: /designer/
+Disallow: /admin
+Disallow: /checkout/
+Disallow: /reset-password
+Disallow: /app
+Disallow: /offline

@@ -61,6 +61,12 @@ Any static host works. Build command `npm run build`, output folder `dist`, and 
 
 An installable app must be served over **HTTPS**.
 
+### Before you launch
+
+1. **Legal pages.** `/privacy` and `/terms` are plain-language drafts that describe what the app really does with data. Fill in `src/data/legal.ts` (registered name, address, contact email, what happens to the platform fee on a cancelled order), have both pages checked by someone qualified in Philippine law, then set `reviewed: true`. Until then both pages show a "Draft" notice and the build prints a reminder.
+2. **The "Inspiration" cards** use stock photographs and sample wording, so they are shown as "Ideas to start from". When you have real jobs to show (with the customer's permission), replace `INSPIRATION_ITEMS` in `src/data/catalog.ts` and set `STORIES_ARE_REAL = true` in `src/pages/LandingPage.tsx`; the section becomes "Made with PrintAir" with each customer's place and quote.
+3. **`VITE_APP_URL`** (optional build variable): the app's public address. With it set, links shared on Facebook, Messenger or Viber show the PrintAir share picture (`public/share-card.png`, made from `brand/share-card.html`).
+
 ### Backend settings for the new address
 
 The app runs on its own address (for example `app.printair.ph`). Two things on the backend know about addresses:

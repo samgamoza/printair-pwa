@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, Suspense } from 'react';
 import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowRight, FolderKanban, Palette, Printer } from 'lucide-react';
 import { AppShell, type ShellNavItem } from '@/components/shell/AppShell';
@@ -6,6 +6,7 @@ import { Sheet } from '@/components/ui/Sheet';
 import { ProjectBuilder } from '@/components/ProjectBuilder';
 import { DesignRequestBuilder } from '@/components/DesignRequestBuilder';
 import { CreateContext, type CreateValue } from './createContext';
+import { PageLoader } from '@/components/ui/states';
 
 const NAV: ShellNavItem[] = [
   { to: '/dashboard', label: 'My Projects', short: 'Projects', icon: FolderKanban, end: true },
@@ -57,7 +58,10 @@ export default function CustomerLayout() {
   return (
     <CreateContext.Provider value={value}>
       <AppShell navItems={NAV} roleLabel="Customer" create={{ label: 'Create', onClick: () => setChooserOpen(true) }}>
-        <Outlet />
+        {/* Keeps the tabs and side rail on screen while the next page's code arrives. */}
+        <Suspense fallback={<PageLoader />}>
+          <Outlet />
+        </Suspense>
       </AppShell>
 
       <Sheet open={chooserOpen} onClose={() => setChooserOpen(false)} size="sm" labelledBy="create-title">

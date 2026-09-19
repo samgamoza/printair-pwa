@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, Suspense } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Home, Inbox, FileText, Package, PackageCheck, Building2, Settings } from 'lucide-react';
 import { AppShell, type ShellNavItem } from '@/components/shell/AppShell';
@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getPartnerCapabilities, isProfileComplete } from '@/lib/api/partner';
 import { getPartnerOpportunities } from '@/lib/api/opportunities';
 import { getPartnerOrders } from '@/lib/api/orders';
+import { PageLoader } from '@/components/ui/states';
 
 export default function PartnerLayout() {
   const { partnerProfile } = useAuth();
@@ -79,7 +80,10 @@ export default function PartnerLayout() {
         ) : null
       }
     >
-      <Outlet />
+      {/* Keeps the tabs and side rail on screen while the next page's code arrives. */}
+        <Suspense fallback={<PageLoader />}>
+          <Outlet />
+        </Suspense>
     </AppShell>
   );
 }

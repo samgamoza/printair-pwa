@@ -1,5 +1,5 @@
 import { useState, useEffect, type ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Mail, MailCheck, Lock, User, Building2, MapPin, Phone } from 'lucide-react';
 import { Sheet } from '@/components/ui/Sheet';
 import { Button } from '@/components/ui/Button';
@@ -308,6 +308,7 @@ export function AuthModal() {
             onContinue={handleEmailContinue}
             submitting={submitting}
             error={error}
+            onLegal={handleClose}
           />
         )}
 
@@ -611,6 +612,7 @@ function EmailStep({
   onContinue,
   submitting,
   error,
+  onLegal,
 }: {
   mode: 'sign-in' | 'join-partner' | 'join-designer';
   email: string;
@@ -618,6 +620,8 @@ function EmailStep({
   onContinue: () => void;
   submitting: boolean;
   error: string | null;
+  /** Closes the sheet when someone follows a link to the terms or privacy page. */
+  onLegal: () => void;
 }) {
   return (
     <div className="animate-fade-up">
@@ -646,6 +650,17 @@ function EmailStep({
         <Button type="submit" variant="primary" size="lg" fullWidth loading={submitting}>
           Continue
         </Button>
+        <p className="text-center text-sm text-ink-500">
+          By continuing you agree to PrintAir&apos;s{' '}
+          <Link to="/terms" onClick={onLegal} className="font-bold text-ink-700 underline underline-offset-2">
+            Terms
+          </Link>{' '}
+          and{' '}
+          <Link to="/privacy" onClick={onLegal} className="font-bold text-ink-700 underline underline-offset-2">
+            Privacy Policy
+          </Link>
+          .
+        </p>
       </form>
     </div>
   );

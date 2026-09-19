@@ -1,6 +1,8 @@
+import { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Users, Building2, FolderKanban, FileText, Star, Palette, MessageSquare } from 'lucide-react';
 import { AppShell, type ShellNavItem } from '@/components/shell/AppShell';
+import { PageLoader } from '@/components/ui/states';
 
 const NAV: ShellNavItem[] = [
   { to: '/admin', label: 'Users', short: 'Users', icon: Users, end: true },
@@ -19,7 +21,10 @@ const NAV: ShellNavItem[] = [
 export default function AdminLayout() {
   return (
     <AppShell navItems={NAV} roleLabel="Admin">
-      <Outlet />
+      {/* Keeps the tabs and side rail on screen while the next page's code arrives. */}
+        <Suspense fallback={<PageLoader />}>
+          <Outlet />
+        </Suspense>
     </AppShell>
   );
 }

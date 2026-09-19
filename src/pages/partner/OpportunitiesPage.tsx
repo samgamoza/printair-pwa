@@ -57,7 +57,7 @@ export default function OpportunitiesPage() {
               <LinkCard key={o.id} to={`/partner/opportunities/${o.id}`} className={isNew ? 'ring-2 ring-magenta-500' : ''}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="slug text-ink-400">
+                    <p className="slug text-ink-500">
                       {isNew && (
                         <span className="relative mr-1 inline-flex h-2.5 w-2.5" aria-hidden="true">
                           <span className="absolute inset-0 animate-pulse-ring rounded-full bg-magenta-500" />

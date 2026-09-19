@@ -246,6 +246,8 @@ export function Assistant({ onOpenBuilder, onOpenProvider }: AssistantProps) {
         role="dialog"
         aria-label="PrintAir assistant"
         aria-hidden={!open}
+        // Closed, the panel is only faded out, so without this its buttons stay reachable by keyboard.
+        {...(open ? {} : ({ inert: '' } as Record<string, string>))}
       >
         <div className="overflow-hidden rounded-4xl bg-white shadow-lift ring-1 ring-ink-900/10">
           {/* Header */}

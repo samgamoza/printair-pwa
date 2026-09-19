@@ -22,9 +22,11 @@ export function DemoSwitcher() {
   }
 
   return (
-    <div className="fixed left-3 top-[calc(var(--sat)+4.25rem)] z-[130] lg:bottom-5 lg:left-auto lg:right-28 lg:top-auto">
+    // Phones: a small tab on the left edge, clear of the header, the tabs and the page's own text.
+    // Desktop: a labelled pill beside the assistant.
+    <div className="fixed left-0 top-[42%] z-[130] lg:bottom-5 lg:left-auto lg:right-28 lg:top-auto">
       {open && (
-        <div className="mb-2 w-72 rounded-3xl bg-white p-3 shadow-lift ring-1 ring-ink-900/10">
+        <div className="fixed inset-x-3 top-[calc(var(--sat)+4.5rem)] mx-auto max-w-sm rounded-3xl bg-white p-3 shadow-lift ring-1 ring-ink-900/10 lg:static lg:mx-0 lg:mb-2 lg:w-72">
           <div className="flex items-center justify-between px-2 pb-2">
             <p className="font-display text-lg font-bold text-ink-950">View the demo as…</p>
             <button type="button" onClick={() => setOpen(false)} aria-label="Close" className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-ink-100">
@@ -64,9 +66,11 @@ export function DemoSwitcher() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex min-h-10 items-center gap-2 rounded-full bg-sun-400 px-4 text-sm font-extrabold text-ink-950 shadow-lift ring-2 ring-ink-950 active:scale-95"
+        aria-label={`Demo${current ? `: ${current}` : ''}`}
+        className="flex min-h-11 items-center gap-2 rounded-r-full bg-sun-400/90 pl-1.5 pr-2.5 text-sm font-extrabold text-ink-950 shadow-lift ring-2 ring-ink-950 active:scale-95 lg:min-h-10 lg:rounded-full lg:px-4"
       >
-        <Eye className="h-4 w-4" /> Demo{current ? `: ${current}` : ''}
+        <Eye className="h-4 w-4" />
+        <span className="hidden lg:inline">Demo{current ? `: ${current}` : ''}</span>
       </button>
     </div>
   );

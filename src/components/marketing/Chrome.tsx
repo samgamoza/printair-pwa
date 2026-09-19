@@ -77,7 +77,7 @@ export function MarketingFooter() {
           </p>
         </div>
         <div>
-          <p className="slug text-white/40">Explore</p>
+          <p className="slug text-white/60">Explore</p>
           <div className="mt-3">
             <Link to="/partners" className={link}>
               Printing partners
@@ -92,7 +92,7 @@ export function MarketingFooter() {
           </div>
         </div>
         <div>
-          <p className="slug text-white/40">Work with us</p>
+          <p className="slug text-white/60">Work with us</p>
           <div className="mt-3">
             <button type="button" onClick={openJoinPartner} className={`${link} text-left`}>
               Join as a Printing Partner
@@ -104,7 +104,15 @@ export function MarketingFooter() {
         </div>
       </div>
       <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-4 border-t border-white/10 px-5 py-6 sm:px-8">
-        <p className="text-sm text-white/45">Made in the Philippines</p>
+        <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white/60">
+          <span>Made in the Philippines</span>
+          <Link to="/privacy" className="underline-offset-4 hover:text-white hover:underline">
+            Privacy
+          </Link>
+          <Link to="/terms" className="underline-offset-4 hover:text-white hover:underline">
+            Terms
+          </Link>
+        </p>
         <ColorBar size="h-2 w-5" />
       </div>
       <div className="pb-safe" />

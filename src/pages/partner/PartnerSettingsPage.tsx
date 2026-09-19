@@ -29,7 +29,7 @@ export default function PartnerSettingsPage() {
       <PageHeader title="Settings" />
 
       <Card>
-        <p className="slug text-ink-400">Account email</p>
+        <p className="slug text-ink-500">Account email</p>
         <p className="mt-2 flex items-center gap-2.5 break-all font-bold text-ink-900">
           <Mail className="h-5 w-5 shrink-0 text-ink-400" /> {profile?.email}
         </p>

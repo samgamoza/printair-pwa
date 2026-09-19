@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, Suspense } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Home, Inbox, Package, UserCircle } from 'lucide-react';
 import { AppShell, type ShellNavItem } from '@/components/shell/AppShell';
@@ -6,6 +6,7 @@ import { Banner } from '@/components/ui/states';
 import { useAuth } from '@/contexts/AuthContext';
 import { getDesignerOpportunities } from '@/lib/api/designer';
 import { getDesignerOrders } from '@/lib/api/designOrders';
+import { PageLoader } from '@/components/ui/states';
 
 /**
  * Designer workspace shell.
@@ -58,7 +59,10 @@ export default function DesignerLayout() {
       roleLabel="Designer"
       banner={<StatusBanner status={designerProfile?.status} reason={designerProfile?.review_reason} />}
     >
-      <Outlet />
+      {/* Keeps the tabs and side rail on screen while the next page's code arrives. */}
+        <Suspense fallback={<PageLoader />}>
+          <Outlet />
+        </Suspense>
     </AppShell>
   );
 }

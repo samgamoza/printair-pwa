@@ -65,7 +65,9 @@ const square = await sharp({ create: { width: side, height: side, channels: 4, b
   .png()
   .toBuffer();
 
-await sharp(square).resize(512, 512).png().toFile(new URL('logo-mark.png', out).pathname);
+// 256px covers the largest place the mark appears in the app (a 56px tile on a 3x screen) at a
+// quarter of the download. The icons below are cut from the full-size source, not from this file.
+await sharp(square).resize(256, 256).png({ compressionLevel: 9 }).toFile(new URL('logo-mark.png', out).pathname);
 
 /* ---------- 2. App icons: the mark on a white tile ---------- */
 

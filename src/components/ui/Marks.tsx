@@ -11,8 +11,12 @@
  * The ornaments further down are drawn in code so they stay crisp at any size.
  */
 
-/** The orange in the supplied logo, used for "Air" in the wordmark so the lockup reads as one piece. */
-const LOGO_ORANGE = '#f97a1f';
+/**
+ * The orange in the supplied logo, used for "Air" in the wordmark so the lockup reads as one piece.
+ * On light backgrounds the logo's own orange is too pale to read as text (2.5:1), so the wordmark
+ * uses a deeper cut of the same hue there. The artwork itself is never recoloured.
+ */
+const LOGO_ORANGE = { onDark: '#f97a1f', onLight: '#d9570a' };
 
 export function PlaneGlyph({ className = 'h-7 w-7' }: { className?: string }) {
   return (
@@ -61,7 +65,7 @@ export function Logo({
         }`}
         style={{ fontVariationSettings: "'wdth' 88" }}
       >
-        Print<span style={{ color: LOGO_ORANGE }}>Air</span>
+        Print<span style={{ color: tone === 'light' ? LOGO_ORANGE.onDark : LOGO_ORANGE.onLight }}>Air</span>
       </span>
     </span>
   );

@@ -1,7 +1,8 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { fileURLToPath, URL } from 'node:url';
+import { readFileSync } from 'node:fs';
 
 /**
  * `npm run demo` (mode "demo") points the app at a pretend backend that runs inside the browser
@@ -15,10 +16,51 @@ const DEMO_ENV = {
   'import.meta.env.VITE_SUPABASE_ANON_KEY': JSON.stringify('demo-mode-no-real-key'),
 };
 
+/**
+ * Facebook, Messenger, Viber and friends only show a link's picture when its address is complete
+ * (https://…), and a static page can't know its own address. Set VITE_APP_URL on the host and the
+ * share tags in index.html get it; leave it unset and they fall back to relative paths.
+ */
+function appUrl(url: string): Plugin {
+  return {
+    name: 'printair-app-url',
+    buildStart() {
+      // A nudge, not a failure: the legal pages ship with a visible "Draft" notice until someone signs them off.
+      if (/reviewed:\s*false/.test(readFileSync(new URL('./src/data/legal.ts', import.meta.url), 'utf8'))) {
+        this.warn('Privacy Policy and Terms are still marked as drafts — see src/data/legal.ts before launch.');
+      }
+    },
+    transformIndexHtml: {
+      order: 'post',
+      handler(html, ctx) {
+        // The app proper is loaded by a dynamic import (so demo mode can step in first), which hides
+        // it from the browser until the entry script has run. Announcing those files, and the two
+        // fonts every screen uses, lets them download alongside the entry script instead of after it.
+        const files = Object.keys(ctx.bundle ?? {});
+        const pick = (re: RegExp) => files.filter((f) => re.test(f));
+        const tags = [
+          ...pick(/assets\/(App|AuthContext|dialogs)-[\w-]+\.js$/).map((f) => ({
+            tag: 'link',
+            attrs: { rel: 'modulepreload', href: `/${f}`, crossorigin: true },
+            injectTo: 'head' as const,
+          })),
+          ...pick(/assets\/(bricolage-grotesque-latin-wdth-normal|figtree-latin-wght-normal)-[\w-]+\.woff2$/).map((f) => ({
+            tag: 'link',
+            attrs: { rel: 'preload', as: 'font', type: 'font/woff2', href: `/${f}`, crossorigin: true },
+            injectTo: 'head' as const,
+          })),
+        ];
+        return { html: html.replaceAll('__APP_URL__', url.replace(/\/+$/, '')), tags };
+      },
+    },
+  };
+}
+
 export default defineConfig(({ mode }) => ({
   define: mode === 'demo' ? DEMO_ENV : {},
   plugins: [
     react(),
+    appUrl(loadEnv(mode, process.cwd(), 'VITE_').VITE_APP_URL ?? ''),
     VitePWA({
       // 'prompt': a new version waits for the person to tap Refresh (see src/pwa/UpdateToast.tsx)
       // rather than reloading underneath them.

@@ -62,7 +62,7 @@ export default function MyQuotationsPage() {
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="slug text-ink-400">{categoryName(q.project.category)}</p>
+                      <p className="slug text-ink-500">{categoryName(q.project.category)}</p>
                       <h2 className="mt-1.5 truncate text-xl text-ink-950">{q.project.title}</h2>
                     </div>
                     <QuoteStatusBadge status={q.status} />

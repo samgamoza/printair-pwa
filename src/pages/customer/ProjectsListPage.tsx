@@ -144,7 +144,7 @@ export default function ProjectsListPage() {
                 <LinkCard key={p.id} to={`/dashboard/projects/${p.id}`}>
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="slug text-ink-400">{categoryName(p.category)}</p>
+                      <p className="slug text-ink-500">{categoryName(p.category)}</p>
                       <h2 className="mt-1.5 truncate text-xl text-ink-950">{p.title}</h2>
                     </div>
                     <ProjectStatusBadge status={p.status} />

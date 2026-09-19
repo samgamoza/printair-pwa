@@ -124,7 +124,7 @@ export default function ActiveProjectsPage() {
               <Card key={o.id} className="flex flex-col">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="slug text-ink-400">{categoryName(o.project.category)}</p>
+                    <p className="slug text-ink-500">{categoryName(o.project.category)}</p>
                     <h2 className="mt-1.5 text-xl text-ink-950">{o.project.title}</h2>
                   </div>
                   <OrderStatusBadge status={o.status} />

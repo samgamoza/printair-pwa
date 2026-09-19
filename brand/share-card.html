@@ -1,0 +1,30 @@
+<!doctype html>
+<!-- Source for public/share-card.png, the 1200x630 picture shown when a PrintAir link is shared.
+     Open through a local server from the repo root and screenshot at 1200x630 to regenerate. -->
+<meta charset="utf-8" />
+<style>
+  @font-face { font-family: Bricolage; src: url('../node_modules/@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-wdth-normal.woff2') format('woff2'); font-weight: 200 800; font-stretch: 75% 100%; }
+  @font-face { font-family: Figtree; src: url('../node_modules/@fontsource-variable/figtree/files/figtree-latin-wght-normal.woff2') format('woff2'); font-weight: 300 900; }
+  html, body { margin: 0; }
+  body { width: 1200px; height: 630px; background: #f6f5fa; position: relative; overflow: hidden; font-family: Figtree, sans-serif; color: #0f0d1a; }
+  .dots { position: absolute; right: -40px; top: -40px; width: 520px; height: 520px; background-image: radial-gradient(#7fdcf8 3.2px, transparent 3.6px); background-size: 26px 26px; opacity: .9; }
+  .wrap { position: absolute; inset: 0; padding: 72px 80px; display: flex; flex-direction: column; }
+  .lockup { display: flex; align-items: center; gap: 20px; }
+  .tile { width: 84px; height: 84px; border-radius: 24px; background: #fff; box-shadow: 0 8px 24px -10px rgba(15,13,26,.25), 0 0 0 1px rgba(15,13,26,.08); display: flex; align-items: center; justify-content: center; }
+  .tile img { width: 78%; }
+  .word { font-family: Bricolage, sans-serif; font-weight: 800; font-size: 50px; letter-spacing: -0.03em; font-stretch: 88%; }
+  .word span { color: #d9570a; }
+  h1 { font-family: Bricolage, sans-serif; font-weight: 700; font-stretch: 92%; font-size: 92px; line-height: .98; letter-spacing: -0.03em; margin: auto 0 0; max-width: 900px; }
+  h1 em { font-style: normal; position: relative; white-space: nowrap; }
+  h1 em::before { content: ''; position: absolute; left: -.12em; right: -.12em; top: .42em; bottom: .06em; background: #ffdf47; border-radius: 12px; transform: rotate(-1deg); z-index: -1; }
+  p { font-size: 30px; color: #565070; margin: 28px 0 0; font-weight: 500; }
+  .bar { position: absolute; right: 80px; top: 107px; z-index: 2; display: flex; gap: 8px; }
+  .bar i { width: 34px; height: 14px; border-radius: 4px; }
+</style>
+<div class="dots"></div>
+<div class="wrap" style="z-index:1">
+  <div class="lockup"><div class="tile"><img src="../public/logo-mark.png" /></div><div class="word">Print<span>Air</span></div></div>
+  <h1>Bring your idea. We'll work out the <em>printing.</em></h1>
+  <p>Compare quotations from verified printing partners in the Philippines.</p>
+</div>
+<div class="bar"><i style="background:#22bdf0"></i><i style="background:#ee2a8b"></i><i style="background:#ffd21f"></i><i style="background:#0f0d1a"></i></div>

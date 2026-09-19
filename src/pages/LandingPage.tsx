@@ -1,15 +1,26 @@
-import { useState, useCallback, useEffect } from 'react';
+import { lazy, Suspense, useState, useCallback, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ArrowRight, Check, Clock, Cpu, MapPin, Palette, Printer, ShieldCheck, TrendingUp, Users } from 'lucide-react';
 import { MarketingHeader, MarketingFooter } from '@/components/marketing/Chrome';
-import { ProjectBuilder } from '@/components/ProjectBuilder';
-import { Assistant } from '@/components/Assistant';
 import { Button } from '@/components/ui/Button';
 import { Rail } from '@/components/ui/Rail';
 import { ColorBar, CropMarks, RegistrationMark } from '@/components/ui/Marks';
 import { InstallBanner } from '@/pwa/InstallPrompt';
 import { useAuth } from '@/contexts/AuthContext';
 import { CATEGORIES, INSPIRATION_ITEMS } from '@/data/catalog';
+
+// The builder and the assistant are the two heaviest things on this page and neither is needed to
+// paint it, so they arrive after: the builder on first use, the assistant once the page has settled.
+const ProjectBuilder = lazy(() => import('@/components/ProjectBuilder').then((m) => ({ default: m.ProjectBuilder })));
+const Assistant = lazy(() => import('@/components/Assistant').then((m) => ({ default: m.Assistant })));
+
+/**
+ * The example cards under "Inspiration" use stock photographs and sample results, so they are
+ * presented as ideas to start from, not as customer stories. When real PrintAir jobs (with the
+ * customer's permission) replace INSPIRATION_ITEMS in src/data/catalog.ts, set this to true and the
+ * section goes back to "Made with PrintAir" with each customer's place and quote.
+ */
+const STORIES_ARE_REAL = false;
 
 const TILE_TINTS = ['bg-cyan-200', 'bg-magenta-200', 'bg-sun-200', 'bg-grape-200', 'bg-leaf-200'];
 
@@ -41,6 +52,8 @@ export default function LandingPage() {
   const { openJoinPartner, openSignIn, session } = useAuth();
   const [builderOpen, setBuilderOpen] = useState(false);
   const [initialCategory, setInitialCategory] = useState<string | null>(null);
+  const [builderWanted, setBuilderWanted] = useState(false);
+  const [assistantReady, setAssistantReady] = useState(false);
   const { hash } = useLocation();
 
   // In-app links such as Help ("/#how") arrive by client-side navigation, which never scrolls
@@ -51,8 +64,18 @@ export default function LandingPage() {
     return () => window.clearTimeout(t);
   }, [hash]);
 
+  useEffect(() => {
+    const t = window.setTimeout(() => {
+      setAssistantReady(true);
+      // Warm the builder too, so the first tap on "Start a project" doesn't wait on the network.
+      void import('@/components/ProjectBuilder');
+    }, 1500);
+    return () => window.clearTimeout(t);
+  }, []);
+
   const openBuilder = useCallback((categoryId?: string) => {
     setInitialCategory(categoryId ?? null);
+    setBuilderWanted(true);
     setBuilderOpen(true);
   }, []);
 
@@ -151,7 +174,7 @@ export default function LandingPage() {
           <div className="mx-auto max-w-6xl px-5 sm:px-8">
             <p className="slug text-cyan-700">How it works</p>
             <h2 className="mt-2 max-w-2xl text-4xl text-ink-950 sm:text-5xl">
-              From idea to finished print, <span className="text-ink-400">guided at every step.</span>
+              From idea to finished print, <span className="text-ink-500">guided at every step.</span>
             </h2>
             <ol className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {STEPS.map((s, i) => (
@@ -170,11 +193,12 @@ export default function LandingPage() {
         {/* ---------- Stories ---------- */}
         <section id="inspiration" className="scroll-mt-20 py-14 lg:py-20">
           <Rail
-            label="customer stories"
+            label={STORIES_ARE_REAL ? 'customer stories' : 'ideas'}
             header={
               <>
                 <p className="slug text-grape-600">Inspiration</p>
-                <h2 className="mt-2 text-4xl text-ink-950 sm:text-5xl">Made with PrintAir</h2>
+                <h2 className="mt-2 text-4xl text-ink-950 sm:text-5xl">{STORIES_ARE_REAL ? 'Made with PrintAir' : 'Ideas to start from'}</h2>
+                {!STORIES_ARE_REAL && <p className="mt-3 max-w-xl text-ink-600">Typical sets for businesses like yours. Pick one and make it your own.</p>}
               </>
             }
           >
@@ -199,7 +223,13 @@ export default function LandingPage() {
                 <div className="flex flex-1 flex-col p-5">
                   <h3 className="text-xl text-ink-950">{item.title}</h3>
                   <p className="mt-1 flex items-center gap-1 text-sm text-ink-500">
-                    <MapPin className="h-3.5 w-3.5" /> {item.location}
+                    {STORIES_ARE_REAL ? (
+                      <>
+                        <MapPin className="h-3.5 w-3.5" /> {item.location}
+                      </>
+                    ) : (
+                      <>For: {item.location.split(',')[0].toLowerCase()}</>
+                    )}
                   </p>
                   <div className="mt-3 flex flex-wrap gap-1.5">
                     {item.items.map((x) => (
@@ -208,7 +238,11 @@ export default function LandingPage() {
                       </span>
                     ))}
                   </div>
-                  <p className="mt-4 flex-1 rounded-2xl rounded-tl-md bg-sun-50 px-4 py-3 text-ink-800">&ldquo;{item.result}&rdquo;</p>
+                  {STORIES_ARE_REAL ? (
+                    <p className="mt-4 flex-1 rounded-2xl rounded-tl-md bg-sun-50 px-4 py-3 text-ink-800">&ldquo;{item.result}&rdquo;</p>
+                  ) : (
+                    <span className="flex-1" />
+                  )}
                   <Button variant="secondary" className="mt-4" onClick={() => openBuilder(categoryIdFor(item.category))} iconRight={<ArrowRight className="h-4 w-4" />}>
                     Start something like this
                   </Button>
@@ -290,8 +324,10 @@ export default function LandingPage() {
 
       <MarketingFooter />
 
-      <ProjectBuilder open={builderOpen} onClose={closeBuilder} initialCategoryId={initialCategory} />
-      <Assistant onOpenBuilder={openBuilder} onOpenProvider={openJoinPartner} />
+      <Suspense fallback={null}>
+        {builderWanted && <ProjectBuilder open={builderOpen} onClose={closeBuilder} initialCategoryId={initialCategory} />}
+        {assistantReady && <Assistant onOpenBuilder={openBuilder} onOpenProvider={openJoinPartner} />}
+      </Suspense>
     </div>
   );
 }
@@ -318,7 +354,7 @@ function HeroArt() {
 
       <div className="absolute inset-x-[9%] top-[24%] rounded-3xl bg-white p-4 shadow-lift ring-1 ring-ink-900/5">
         <div className="flex items-center justify-between gap-2">
-          <p className="slug text-ink-400">Coffee shop</p>
+          <p className="slug text-ink-500">Coffee shop</p>
           <span className="rounded-full bg-sun-200 px-2.5 py-1 text-xs font-extrabold text-sun-900">3 quotations</span>
         </div>
         <p className="mt-1.5 font-display text-xl font-bold text-ink-950">Kraft cup sleeves</p>
