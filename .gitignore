@@ -1,0 +1,22 @@
+node_modules
+dist
+dev-dist
+*.local
+
+# Environment files hold project keys. Only the example is committed.
+.env
+.env.*
+!.env.example
+
+logs
+*.log
+npm-debug.log*
+
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db
+
+# Local agent/editor state can hold API tokens in plaintext.
+.claude/settings.local.json

@@ -1,0 +1,10 @@
+# Cloudflare Pages SPA rewrite.
+#
+# react-router-dom uses client-side routing, so every path must serve
+# index.html or a hard refresh on e.g. /designer/opportunities/:id 404s.
+# Same rule netlify.toml already declares for Netlify — Pages reads this
+# file from the build output instead, and Vite copies public/ into dist/.
+#
+# Kept last-resort (200, not 301): it rewrites rather than redirects, so the
+# URL the user sees is preserved and the router can read it.
+/*    /index.html   200
