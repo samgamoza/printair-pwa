@@ -106,8 +106,12 @@ export default defineConfig(({ mode }) => ({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  // lucide-react is deliberately NOT excluded from pre-bundling (the original project excluded
+  // it). Left unbundled, the dev server serves every icon as its own file, and ad blockers refuse
+  // some of them by name (fingerprint.js, among others), which takes the whole app down with
+  // "Failed to fetch dynamically imported module". Pre-bundled, the icons arrive as one file.
   optimizeDeps: {
-    exclude: ['lucide-react'],
+    include: ['lucide-react'],
   },
   preview: {
     host: true,

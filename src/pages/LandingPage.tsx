@@ -6,7 +6,7 @@ import { ProjectBuilder } from '@/components/ProjectBuilder';
 import { Assistant } from '@/components/Assistant';
 import { Button } from '@/components/ui/Button';
 import { ColorBar, CropMarks, RegistrationMark } from '@/components/ui/Marks';
-import { InstallBanner } from '@/pwa/InstallBanner';
+import { InstallBanner } from '@/pwa/InstallPrompt';
 import { useAuth } from '@/contexts/AuthContext';
 import { CATEGORIES, INSPIRATION_ITEMS } from '@/data/catalog';
 

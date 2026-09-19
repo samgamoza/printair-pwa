@@ -9,7 +9,7 @@ import { Sheet } from '@/components/ui/Sheet';
 import { Avatar, Badge } from '@/components/ui/bits';
 import { useDialogs } from '@/components/ui/dialogs';
 import { useInstall } from '@/pwa/install';
-import { IosInstallSheet } from '@/pwa/InstallBanner';
+import { IosInstallSheet } from '@/pwa/InstallPrompt';
 
 const ROLE_NAME: Record<string, string> = {
   customer: 'Customer',

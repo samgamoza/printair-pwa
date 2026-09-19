@@ -7,7 +7,7 @@ import { Logo, ColorBar } from '@/components/ui/Marks';
 import { Avatar } from '@/components/ui/bits';
 import { Sheet } from '@/components/ui/Sheet';
 import { AccountSheet } from './AccountSheet';
-import { InstallBanner } from '@/pwa/InstallBanner';
+import { InstallBanner } from '@/pwa/InstallPrompt';
 import { useOnline } from '@/pwa/useOnline';
 
 export type ShellNavItem = {
