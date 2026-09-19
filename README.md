@@ -15,7 +15,18 @@ This is a **separate repo** from the PrintAir website (`printair_claude`). It ha
 
 Because both front ends point at the same Supabase project, someone can start a project on the website and finish it in the app. When the database changes, change it in the website repo's `supabase/migrations/`, then copy the regenerated `src/lib/api/database.types.ts` and any changed `src/lib/api/*.ts` files here.
 
-## Run it
+## Try it with sample data (no backend needed)
+
+On Windows, double-click **`Start PrintAir Demo.bat`**. Anywhere else:
+
+```bash
+npm install
+npm run demo
+```
+
+The browser opens on the app with a yellow **Demo** button. Use it to switch between a visitor, a customer, a printing partner, a designer and an admin, and click through everything. The "backend" is a stand-in that runs inside the browser tab (`src/demo/`), so nothing is sent anywhere and no account is needed. What you do carries across roles — choose a quote as the customer, pay the mock platform fee, then switch to the partner and the job is in Active Projects — until you close the tab or press "Reset sample data". None of the demo code is included in a normal `npm run build`.
+
+## Run it against the real backend
 
 Requires Node 20 or newer.
 

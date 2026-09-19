@@ -3,7 +3,20 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { fileURLToPath, URL } from 'node:url';
 
-export default defineConfig({
+/**
+ * `npm run demo` (mode "demo") points the app at a pretend backend that runs inside the browser
+ * tab — see src/demo/install.ts. The values are set here rather than in an env file because
+ * they are not secrets and not configuration anyone should edit: the address is deliberately
+ * unreachable (.invalid) and the key is a placeholder.
+ */
+const DEMO_ENV = {
+  'import.meta.env.VITE_DEMO': JSON.stringify('1'),
+  'import.meta.env.VITE_SUPABASE_URL': JSON.stringify('https://demo.printair.invalid'),
+  'import.meta.env.VITE_SUPABASE_ANON_KEY': JSON.stringify('demo-mode-no-real-key'),
+};
+
+export default defineConfig(({ mode }) => ({
+  define: mode === 'demo' ? DEMO_ENV : {},
   plugins: [
     react(),
     VitePWA({
@@ -106,4 +119,4 @@ export default defineConfig({
     host: true,
     allowedHosts: true,
   },
-});
+}));
