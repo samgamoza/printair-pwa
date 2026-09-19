@@ -27,7 +27,7 @@ if not exist "node_modules\" (
 )
 
 echo.
-echo  Starting PrintAir. Your browser will open by itself.
+echo  Starting PrintAir at http://localhost:4180  ^(your browser will open by itself^)
 echo  Use the yellow "Demo" button to switch between customer, partner, designer and admin.
 echo  Close this window to stop.
 echo.

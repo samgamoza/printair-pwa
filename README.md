@@ -24,7 +24,7 @@ npm install
 npm run demo
 ```
 
-The browser opens on the app with a yellow **Demo** button. Use it to switch between a visitor, a customer, a printing partner, a designer and an admin, and click through everything. The "backend" is a stand-in that runs inside the browser tab (`src/demo/`), so nothing is sent anywhere and no account is needed. What you do carries across roles — choose a quote as the customer, pay the mock platform fee, then switch to the partner and the job is in Active Projects — until you close the tab or press "Reset sample data". None of the demo code is included in a normal `npm run build`.
+The browser opens at `http://localhost:4180` with a yellow **Demo** button. Use it to switch between a visitor, a customer, a printing partner, a designer and an admin, and click through everything. The "backend" is a stand-in that runs inside the browser tab (`src/demo/`), so nothing is sent anywhere and no account is needed. What you do carries across roles — choose a quote as the customer, pay the mock platform fee, then switch to the partner and the job is in Active Projects — until you close the tab or press "Reset sample data". None of the demo code is included in a normal `npm run build`.
 
 ## Run it against the real backend
 

@@ -30,8 +30,30 @@
     <meta property="og:image" content="/icons/icon-512.png" />
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Shown until the app takes over, so a slow or failed start is never a silent blank page. -->
+      <div id="boot" style="min-height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px; text-align: center; font-family: system-ui, sans-serif; background: #f6f5fa; color: #565070">
+        <div style="font-size: 22px; font-weight: 800; color: #0f0d1a">Print<span style="color: #ee2a8b">Air</span></div>
+        <div id="boot-status">Loading…</div>
+      </div>
+    </div>
     <noscript>PrintAir needs JavaScript turned on to run.</noscript>
+    <script>
+      // If the app fails before it can draw anything, say so on screen instead of staying blank.
+      (function () {
+        function show(message) {
+          var boot = document.getElementById('boot-status');
+          if (!boot) return; // the app has already taken over; its own error screen handles it
+          boot.innerHTML =
+            '<b style="color:#b01524">PrintAir could not start.</b><br><br><code style="font-size:13px;word-break:break-word">' +
+            String(message).replace(/</g, '&lt;') +
+            '</code><br><br>Try a hard refresh (Ctrl+Shift+R). If this stays, send this message to whoever set the app up.';
+        }
+        window.__printairBootError = show;
+        window.addEventListener('error', function (e) { show(e.message || 'A script failed to load.'); });
+        window.addEventListener('unhandledrejection', function (e) { show((e.reason && e.reason.message) || e.reason || 'Unknown error'); });
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

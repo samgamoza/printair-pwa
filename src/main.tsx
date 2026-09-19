@@ -13,6 +13,12 @@ async function start() {
   const demo = import.meta.env.VITE_DEMO === '1';
   let DemoSwitcher: (() => JSX.Element) | null = null;
   if (demo) {
+    // Another project may have left a service worker on this localhost address; it would serve
+    // that project's cached pages in place of this app. Demo mode never needs one, so clear them.
+    if ('serviceWorker' in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations().catch(() => []);
+      await Promise.all(registrations.map((r) => r.unregister()));
+    }
     const [{ installDemoBackend }, switcher] = await Promise.all([import('./demo/install'), import('./demo/DemoSwitcher')]);
     installDemoBackend();
     DemoSwitcher = switcher.DemoSwitcher;
@@ -41,4 +47,7 @@ async function start() {
   );
 }
 
-void start();
+start().catch((error: unknown) => {
+  console.error('PrintAir failed to start:', error);
+  (window as Window & { __printairBootError?: (m: unknown) => void }).__printairBootError?.(error instanceof Error ? error.message : error);
+});
