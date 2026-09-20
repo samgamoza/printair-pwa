@@ -1,6 +1,6 @@
 import { lazy, Suspense, useState, useCallback, useEffect, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ArrowRight, Check, Clock, Compass, Cpu, MapPin, Palette, Printer, ShieldCheck, TrendingUp, Users } from 'lucide-react';
+import { ArrowRight, Check, Clock, Compass, Cpu, MapPin, Package, Palette, Printer, ShieldCheck, TrendingUp, Users } from 'lucide-react';
 import { MarketingHeader, MarketingFooter } from '@/components/marketing/Chrome';
 import { Button } from '@/components/ui/Button';
 import { Rail } from '@/components/ui/Rail';
@@ -73,7 +73,7 @@ function categoryIdFor(name: string): string | undefined {
 }
 
 export default function LandingPage() {
-  const { openJoinPartner } = useAuth();
+  const { openJoinPartner, profile } = useAuth();
   const [builderOpen, setBuilderOpen] = useState(false);
   const [initialCategory, setInitialCategory] = useState<string | null>(null);
   const [storyFilter, setStoryFilter] = useState<StoryFilter>('All');
@@ -124,7 +124,7 @@ export default function LandingPage() {
         {/* ---------- Hero ---------- */}
         <section className="relative overflow-hidden">
           <span className="pointer-events-none absolute -right-20 -top-10 h-64 w-64 bg-halftone-lg bg-dots-lg text-cyan-300/70 lg:left-[-4rem] lg:right-auto lg:top-24 lg:h-72 lg:w-72" aria-hidden="true" />
-          <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-5 pb-14 pt-10 sm:px-8 lg:grid-cols-[1.1fr_1fr] lg:pb-24 lg:pt-20">
+          <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-5 pb-10 pt-10 sm:px-8 lg:grid-cols-[1.1fr_1fr] lg:pb-12 lg:pt-16">
             <div>
               <p className="slug text-ink-600">
                 <ColorBar /> Your AI printing partner · Philippines
@@ -168,6 +168,90 @@ export default function LandingPage() {
             <HeroArt />
           </div>
         </section>
+
+        {/* ---------- Two ways in ---------- */}
+        {/* Straight under the hero: a visitor says which side of the marketplace they are on and goes
+            down that side's own onboarding. Hidden for a signed-in partner, designer or admin, who
+            already chose. */}
+        {(!profile || profile.role === 'customer') && (
+          <section id="start" aria-labelledby="start-title" className="mx-auto max-w-6xl scroll-mt-20 px-5 pb-12 sm:px-8 lg:pb-16">
+            <p className="slug text-ink-500">Get started</p>
+            <h2 id="start-title" className="mt-2 text-3xl text-ink-950 sm:text-4xl">
+              What brings you to PrintAir?
+            </h2>
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => openBuilder()}
+                className="group relative flex flex-col overflow-hidden rounded-5xl bg-magenta-100 p-6 text-left transition-transform duration-200 hover:-translate-y-1 active:scale-[0.99] sm:p-8"
+              >
+                <span className="pointer-events-none absolute -right-8 -top-8 h-40 w-52 bg-halftone-lg bg-dots-lg text-magenta-500/25" aria-hidden="true" />
+                <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-ink-950 shadow-soft">
+                  <Package className="h-7 w-7" strokeWidth={1.9} />
+                </span>
+                <span className="slug mt-6 text-magenta-700">I need something printed</span>
+                <span className="mt-2 font-display text-2xl font-bold leading-tight text-ink-950 sm:text-3xl">Start a guided print or packaging project</span>
+                <span className="mt-3 max-w-md text-ink-700">
+                  Answer a few simple questions. Verified printing partners send you quotations to compare. No printing knowledge needed.
+                </span>
+                <ul className="mb-7 mt-5 space-y-2 text-sm font-bold text-ink-800">
+                  {['A few quick questions, no jargon', 'Quotations from verified partners', 'You choose, then track it to delivery'].map((t) => (
+                    <li key={t} className="flex items-center gap-2">
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-magenta-700">
+                        <Check className="h-3 w-3" strokeWidth={3.5} />
+                      </span>
+                      {t}
+                    </li>
+                  ))}
+                </ul>
+                <span
+                  data-variant="accent"
+                  className="mt-auto inline-flex min-h-14 items-center justify-center gap-2 self-start rounded-full bg-magenta-600 px-7 font-bold text-white shadow-magenta transition-colors group-hover:bg-magenta-700 max-sm:w-full"
+                >
+                  Start my project <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={openJoinPartner}
+                className="group relative flex flex-col overflow-hidden rounded-5xl bg-ink-950 p-6 text-left text-white transition-transform duration-200 hover:-translate-y-1 active:scale-[0.99] sm:p-8"
+              >
+                <span className="pointer-events-none absolute -right-8 -top-8 h-40 w-52 bg-halftone-lg bg-dots-lg text-white/10" aria-hidden="true" />
+                <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 text-sun-300">
+                  <Printer className="h-7 w-7" strokeWidth={1.9} />
+                </span>
+                <span className="slug mt-6 text-sun-300">I run a printing business</span>
+                <span className="mt-2 font-display text-2xl font-bold leading-tight sm:text-3xl">Join as a verified PrintAir partner</span>
+                <span className="mt-3 max-w-md text-white/70">
+                  Receive production-ready jobs that fit your machines and schedule. Quote only the ones you want.
+                </span>
+                <ul className="mb-7 mt-5 space-y-2 text-sm font-bold text-white/90">
+                  {['Free to join', 'Qualified jobs, no price fishing', 'Reviews that build your reputation'].map((t) => (
+                    <li key={t} className="flex items-center gap-2">
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-sun-400 text-ink-950">
+                        <Check className="h-3 w-3" strokeWidth={3.5} />
+                      </span>
+                      {t}
+                    </li>
+                  ))}
+                </ul>
+                <span
+                  data-variant="light"
+                  className="mt-auto inline-flex min-h-14 items-center justify-center gap-2 self-start rounded-full bg-white px-7 font-bold text-ink-950 transition-colors group-hover:bg-sun-300 max-sm:w-full"
+                >
+                  Become a partner <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                </span>
+              </button>
+            </div>
+            <p className="mt-4 text-sm text-ink-600">
+              A graphic designer?{' '}
+              <Link to="/design" className="font-bold text-ink-950 underline underline-offset-4 hover:text-magenta-700">
+                Apply to take design commissions
+              </Link>
+            </p>
+          </section>
+        )}
 
         <div className="mx-auto max-w-6xl px-5 sm:px-8">
           <InstallBanner />

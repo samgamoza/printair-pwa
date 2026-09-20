@@ -127,6 +127,7 @@ docs/
 - A global "You're offline" strip and an offline screen for signed-in areas.
 - Help in the account menu goes to "How it works" (in the original it did nothing).
 - "Send password reset link" is in every role's account menu (the original offered it only in Partner Settings).
+- The welcome page asks "What brings you to PrintAir?" straight under the hero, with two large doors: "I need something printed" opens the project builder, "I run a printing business" opens partner onboarding (plus a line for designers). The website had the same pair as smaller cards inside its hero. Hidden for a signed-in partner, designer or admin.
 - Public profiles gain a call to action: "Start a project" on a partner, "Request a design" on a designer (customers and visitors only).
 - Starting a design request from anywhere in the customer area moves to My Designs first, so the new request is on screen when the form closes.
 - The welcome page is one page rather than a stack of marketing sections. Left out on purpose, because they were decoration or sample content rather than features: the scrolling marquee, the navbar's scroll-spy and progress bar, the four sample partner cards with count-up statistics (the real directory is one tap away), and the "featured" builder preview card. Everything a visitor can *do* there is kept: start a project (from the hero, a category, or an idea card), filter the ideas, explore, reach both directories, join as a partner or designer, read how it works, and find the contact address.
