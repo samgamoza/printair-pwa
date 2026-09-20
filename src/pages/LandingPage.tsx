@@ -1,6 +1,6 @@
 import { lazy, Suspense, useState, useCallback, useEffect, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ArrowRight, Check, Clock, Compass, Cpu, MapPin, Package, Palette, Printer, ShieldCheck, TrendingUp, Users } from 'lucide-react';
+import { ArrowRight, Check, Clock, Cpu, MapPin, Package, Palette, Printer, ShieldCheck, TrendingUp, Users } from 'lucide-react';
 import { MarketingHeader, MarketingFooter } from '@/components/marketing/Chrome';
 import { Button } from '@/components/ui/Button';
 import { Rail } from '@/components/ui/Rail';
@@ -124,7 +124,7 @@ export default function LandingPage() {
         {/* ---------- Hero ---------- */}
         <section className="relative overflow-hidden">
           <span className="pointer-events-none absolute -right-20 -top-10 h-64 w-64 bg-halftone-lg bg-dots-lg text-cyan-300/70 lg:left-[-4rem] lg:right-auto lg:top-24 lg:h-72 lg:w-72" aria-hidden="true" />
-          <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-5 pb-10 pt-10 sm:px-8 lg:grid-cols-[1.1fr_1fr] lg:pb-12 lg:pt-16">
+          <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-5 pb-8 pt-10 sm:px-8 lg:grid-cols-[1.1fr_1fr] lg:pb-10 lg:pt-14">
             <div>
               <p className="slug text-ink-600">
                 <ColorBar /> Your AI printing partner · Philippines
@@ -140,19 +140,9 @@ export default function LandingPage() {
                 PrintAir guides you from business idea to professionally manufactured print products — with intelligent
                 recommendations and trusted production partners at every step.
               </p>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Button variant="accent" size="lg" onClick={() => openBuilder()} iconRight={<ArrowRight className="h-5 w-5" />}>
-                  Start a project
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  icon={<Compass className="h-5 w-5" />}
-                  onClick={() => document.getElementById('inspiration')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-                >
-                  Explore print ideas
-                </Button>
-              </div>
+              {/* No buttons here on purpose: the two doors directly below are the hero's call to action.
+                  A "Start a project" button a thumb's width above a "Start my project" card was the same
+                  choice offered twice. */}
               <ul className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-sm font-bold text-ink-700">
                 {['Free to post', 'Compare real quotations', 'Track to delivery'].map((t) => (
                   <li key={t} className="flex items-center gap-1.5">
@@ -165,7 +155,10 @@ export default function LandingPage() {
               </ul>
             </div>
 
-            <HeroArt />
+            {/* Phones go straight from the pitch to the two doors; the illustration would only push them down. */}
+            <div className="hidden lg:block">
+              <HeroArt />
+            </div>
           </div>
         </section>
 
