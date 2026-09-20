@@ -1,5 +1,6 @@
 import { useState, useEffect, type ReactNode } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useFlowSkin } from '@/lib/look';
 import { ArrowLeft, ArrowRight, Mail, MailCheck, Lock, User, Building2, MapPin, Phone } from 'lucide-react';
 import { Sheet } from '@/components/ui/Sheet';
 import { Button } from '@/components/ui/Button';
@@ -26,6 +27,7 @@ const SERVICE_CATEGORIES = CATEGORIES.filter((c) => !c.isSpecial);
 
 export function AuthModal() {
   const { authModal, authStayPut, closeAuthModal, refreshProfile } = useAuth();
+  const skin = useFlowSkin();
   const navigate = useNavigate();
   const open = authModal !== 'closed';
   const mode: 'sign-in' | 'join-partner' | 'join-designer' =
@@ -298,7 +300,7 @@ export function AuthModal() {
   };
 
   return (
-    <Sheet open={open} onClose={handleClose} size="sm" labelledBy="auth-title">
+    <Sheet open={open} onClose={handleClose} size="sm" labelledBy="auth-title" skin={skin}>
       <div className="px-5 pb-8 pt-5 sm:px-8 sm:pb-9 sm:pt-7">
         {step === 'email' && (
           <EmailStep

@@ -118,6 +118,10 @@ Full contract: `docs/DESIGN-SYSTEM.md`. The essentials: neutrals are `ink-*`, ap
 
 Reference implementations to copy from: `pages/customer/ProjectsListPage.tsx` (list), `pages/customer/ProjectDetailPage.tsx` (detail), `components/ProjectBuilder.tsx` (multi-step flow), `components/DesignRequestBuilder.tsx` (form in a sheet), `pages/customer/CustomerLayout.tsx` (role layout).
 
+### Skins (added 2026-09-20)
+
+The owner asked to try the original website's look (its fonts and warm, Airbnb-like calm) on customer sign-up, partner onboarding and the print-project builder, keeping this app's UX. That is now a skin, not a fork: see "Skins: Process and Classic" in `docs/DESIGN-SYSTEM.md`. Default is `mixed` (Classic on those flows, Process elsewhere); the demo's yellow button has a Look switch — Mixed / New only / Classic everywhere — so the owner can compare. "Classic everywhere" suits the orange logo well and may be where this ends up; don't decide for them.
+
 ## 7. Brand
 
 The logo is the owner's navy-and-orange paper plane. The supplied PNG had a fake transparency checkerboard painted in; `scripts/make-icons.mjs` flood-fills that backdrop from the edges to real transparency, writes `public/logo-mark.png` (256px) and cuts all icons from the full-size source. `PlaneGlyph` is the bare mark, `LogoMark` puts it on a **white tile always** (the navy body disappears on the dark side rail), `Logo` adds the wordmark. "Air" in the wordmark takes the logo's orange — `#f97a1f` on dark, a deeper `#d9570a` on light for contrast — and orange is used nowhere else in the UI. App icons are the mark on a white tile; maskable icons keep it inside the safe zone. `public/share-card.png` is a 1200×630 screenshot of `brand/share-card.html` (serve the repo root locally and screenshot at that size to regenerate).
@@ -172,6 +176,7 @@ Backend mirrored into this repo on 2026-09-20 (34 files from `printair_claude` @
 
 ### Open — needs the owner
 
+0a. **Which look.** Mixed, new only, or Classic everywhere (Look switch in the demo). 
 0. **Which front end launches.** The owner is comparing this PWA with the original website. One idea worth offering: bring the website's Airbnb-style guided start flow into the PWA's design, so they don't have to choose between them.
 
 1. **Legal.** Fill `src/data/legal.ts` (registered name, address, contact email, platform-fee refund rule — deliberately blank, it is a business decision), have `/privacy` and `/terms` reviewed by someone qualified in Philippine law, set `reviewed: true`. Until then both pages show "Draft" and the build warns. The drafts were written from what the code does; do not add policy the owner hasn't decided.

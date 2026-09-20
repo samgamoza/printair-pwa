@@ -32,6 +32,7 @@ export function Sheet({
   full = false,
   hideClose = false,
   footer,
+  skin = '',
 }: {
   open: boolean;
   onClose: () => void;
@@ -42,6 +43,8 @@ export function Sheet({
   hideClose?: boolean;
   /** Pinned below the scrolling content — where the primary action lives on a phone. */
   footer?: ReactNode;
+  /** Skin class for everything in the sheet, e.g. `classic` (see src/lib/look.ts). Sheets sit outside the page flow, so they carry it themselves. */
+  skin?: string;
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
   // Callers pass a fresh onClose on every render; keeping it in a ref stops the effect below
@@ -69,13 +72,14 @@ export function Sheet({
   if (!open) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center sm:p-6">
+    <div className={`fixed inset-0 z-[100] flex items-end justify-center sm:items-center sm:p-6 ${skin}`}>
       <div className="absolute inset-0 animate-fade-in bg-ink-950/55 backdrop-blur-[3px]" onClick={onClose} aria-hidden="true" />
       <div
         ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={labelledBy}
+        data-sheet
         className={`relative z-10 flex w-full flex-col overflow-hidden bg-white shadow-lift animate-sheet-up sm:animate-pop-in sm:rounded-4xl ${
           widths[size]
         } ${full ? 'h-[100dvh] sm:h-auto sm:max-h-[90vh]' : 'max-h-[92dvh] rounded-t-4xl sm:max-h-[90vh]'}`}
@@ -98,7 +102,7 @@ export function Sheet({
           {!footer && <div className="pb-safe" />}
         </div>
         {footer && (
-          <div className="shrink-0 border-t border-ink-100 bg-white/95 px-5 pt-3 backdrop-blur sm:px-8">
+          <div data-sheet-footer className="shrink-0 border-t border-ink-100 bg-white/95 px-5 pt-3 backdrop-blur sm:px-8">
             {footer}
             <div className="pb-safe h-3 box-content" />
           </div>

@@ -60,6 +60,7 @@ export function Logo({
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
       <LogoMark className={markClassName} tone={tone} />
       <span
+        data-wordmark
         className={`font-display text-[1.35rem] font-extrabold leading-none tracking-tight ${
           tone === 'light' ? 'text-white' : 'text-ink-950'
         }`}
@@ -74,7 +75,7 @@ export function Logo({
 /** The crosshair printers use to line up plates. Purely decorative here. */
 export function RegistrationMark({ className = 'h-6 w-6' }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" className={className} aria-hidden="true">
+    <svg data-ornament viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" className={className} aria-hidden="true">
       <circle cx="12" cy="12" r="6" />
       <path d="M12 1v22M1 12h22" />
       <circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none" />
@@ -85,7 +86,7 @@ export function RegistrationMark({ className = 'h-6 w-6' }: { className?: string
 /** The colour control strip from the edge of a press sheet. */
 export function ColorBar({ className = '', size = 'h-2.5 w-2.5' }: { className?: string; size?: string }) {
   return (
-    <span className={`inline-flex gap-1 ${className}`} aria-hidden="true">
+    <span data-ornament className={`inline-flex gap-1 ${className}`} aria-hidden="true">
       <span className={`${size} rounded-[3px] bg-cyan-400`} />
       <span className={`${size} rounded-[3px] bg-magenta-500`} />
       <span className={`${size} rounded-[3px] bg-sun-400`} />
@@ -98,7 +99,7 @@ export function ColorBar({ className = '', size = 'h-2.5 w-2.5' }: { className?:
 export function CropMarks({ className = 'text-ink-300' }: { className?: string }) {
   const arm = 'absolute h-3 w-3 border-current';
   return (
-    <span className={`pointer-events-none absolute inset-0 ${className}`} aria-hidden="true">
+    <span data-ornament className={`pointer-events-none absolute inset-0 ${className}`} aria-hidden="true">
       <span className={`${arm} -left-1.5 -top-1.5 border-b border-r`} />
       <span className={`${arm} -right-1.5 -top-1.5 border-b border-l`} />
       <span className={`${arm} -bottom-1.5 -left-1.5 border-r border-t`} />

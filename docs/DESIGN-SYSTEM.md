@@ -10,6 +10,18 @@ A print marketplace, dressed in the four inks a press runs: **cyan, magenta, yel
 
 Tone: friendly, confident, plain-spoken. Big type, big touch targets, lots of colour in tiles and badges, black for primary actions, magenta for "create" and for the moments that matter.
 
+## Skins: Process and Classic
+
+The owner likes two things: this app's layout and flow, and the original website's calm, Airbnb-like look (warm paper, ember orange, Fraunces serif headlines, Plus Jakarta Sans). So the look is a **skin**, separate from the layout:
+
+- Four palettes (`ink`, `paper`, `magenta`, `cyan`) and the two font families are CSS variables (`tailwind.config.js`). With no class you get **Process**. Inside a `.classic` wrapper the same class names resolve to the website's values: `magenta-*` becomes ember, `cyan-*` becomes teal, `ink` and `paper` turn warm, `font-display` becomes Fraunces and `font-sans` Plus Jakarta Sans.
+- `src/styles/classic.css` holds what variables can't: the ember gradient button with its glow (keyed on `data-variant`, which `Button` sets), hairline inputs, white hairline option cards instead of coloured tiles (`data-option`, `data-option-icon`, `data-option-sub`, `data-option-tick`), ember progress segments (`data-progress-done` / `-todo`), warm sheet background (`data-sheet`), and hiding the press-room ornaments (`data-ornament`, halftones).
+- `src/lib/look.ts` decides where it applies. `mixed` (default): Classic on the guided flows — `AuthModal` (sign-up, partner and designer onboarding) and `ProjectBuilder` — via `<Sheet skin={useFlowSkin()}>`; Process everywhere else. `process`: Process everywhere. `classic`: `.classic` on `<html>`, Classic everywhere. The switch is in the demo's yellow button only.
+- To put another flow in Classic, pass `skin={useFlowSkin()}` to its `Sheet` (or wrap the page in a `div` with that class). Write components with the normal tokens; never hard-code ember or Fraunces. Mark new option cards and ornaments with the data attributes above so both skins stay right.
+- The wordmark keeps its own face in every skin (`data-wordmark`); the logo artwork is never touched.
+
+When the owner settles on one look, make it the default in `look.ts` and remove the switch.
+
 ## Non-negotiables
 
 1. **Logic is frozen.** State, effects, handlers, API calls, validation, routes, status values and the order things happen in are carried over from the original unchanged. Only JSX, class names and presentational structure change. Keep the original's explanatory comments where the code they describe survives.

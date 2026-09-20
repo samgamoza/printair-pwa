@@ -66,6 +66,7 @@ export function Button({
       disabled={disabled || loading}
       aria-label={ariaLabel}
       aria-busy={loading || undefined}
+      data-variant={rest.variant ?? 'primary'}
       className={classes(rest)}
     >
       {loading ? (
@@ -84,7 +85,7 @@ export function Button({
 /** Same look, but a router link. */
 export function ButtonLink({ to, children, icon, iconRight, ...rest }: CommonProps & { to: string }) {
   return (
-    <Link to={to} className={classes(rest)}>
+    <Link to={to} data-variant={rest.variant ?? 'primary'} className={classes(rest)}>
       {icon}
       {children}
       {iconRight}

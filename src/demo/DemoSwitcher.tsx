@@ -1,6 +1,13 @@
 import { useState } from 'react';
 import { Eye, RotateCcw, X } from 'lucide-react';
 import { DEMO_ROLE_KEY, resetDemoData, setDemoRole } from './install';
+import { setLook, useLook, type Look } from '@/lib/look';
+
+const LOOKS: { key: Look; label: string; note: string }[] = [
+  { key: 'mixed', label: 'Mixed', note: 'New design, with the original website’s look on sign-up, partner onboarding and the project builder.' },
+  { key: 'process', label: 'New only', note: 'The new design everywhere.' },
+  { key: 'classic', label: 'Classic', note: 'The original website’s fonts and colours everywhere, in the new layout.' },
+];
 
 const ROLES: { key: string | null; label: string; who: string; tint: string }[] = [
   { key: null, label: 'Visitor', who: 'Signed out', tint: 'bg-ink-100' },
@@ -13,6 +20,7 @@ const ROLES: { key: string | null; label: string; who: string; tint: string }[] 
 /** Demo mode only: jump between the four kinds of account without signing in. */
 export function DemoSwitcher() {
   const [open, setOpen] = useState(false);
+  const look = useLook();
   const current = localStorage.getItem(DEMO_ROLE_KEY);
 
   function choose(role: string | null) {
@@ -47,6 +55,23 @@ export function DemoSwitcher() {
               </span>
             </button>
           ))}
+          <div className="mt-2 border-t border-ink-100 px-2 pt-3">
+            <p className="text-xs font-extrabold uppercase tracking-wider text-ink-500">Look</p>
+            <div className="mt-2 grid grid-cols-3 gap-1 rounded-2xl bg-ink-100 p-1">
+              {LOOKS.map((l) => (
+                <button
+                  key={l.key}
+                  type="button"
+                  onClick={() => setLook(l.key)}
+                  aria-pressed={look === l.key}
+                  className={`rounded-xl px-1 py-2 text-xs font-bold leading-tight ${look === l.key ? 'bg-white text-ink-950 shadow-soft' : 'text-ink-600 hover:text-ink-950'}`}
+                >
+                  {l.label}
+                </button>
+              ))}
+            </div>
+            <p className="pb-1 pt-2 text-xs text-ink-500">{LOOKS.find((l) => l.key === look)?.note}</p>
+          </div>
           <button
             type="button"
             onClick={() => {

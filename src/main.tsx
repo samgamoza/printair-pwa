@@ -3,7 +3,15 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import '@fontsource-variable/bricolage-grotesque/wdth.css';
 import '@fontsource-variable/figtree';
+// The two faces of the "Classic" skin. Only the CSS is bundled; the font files download the first
+// time something on screen uses them.
+import '@fontsource-variable/fraunces/opsz.css';
+import '@fontsource-variable/plus-jakarta-sans';
 import './index.css';
+import './styles/classic.css';
+import { initLook } from './lib/look';
+
+initLook();
 
 /**
  * The app is imported dynamically so that, in demo mode, the pretend backend is in place before

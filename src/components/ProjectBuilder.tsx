@@ -21,6 +21,7 @@ import {
   type DimensionUnit,
 } from '@/data/catalog';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFlowSkin } from '@/lib/look';
 import {
   createProject,
   updateProject,
@@ -61,6 +62,7 @@ const STEP_ORDER: Step[] = ['category', 'recommend', 'packaging', 'quantity', 't
 export function ProjectBuilder({ open, onClose, initialCategoryId, onWantDesigner }: ProjectBuilderProps) {
   const { session, profile, openSignIn } = useAuth();
   const navigate = useNavigate();
+  const skin = useFlowSkin();
 
   const [step, setStep] = useState<Step>('category');
   const [category, setCategory] = useState<CatalogCategory | null>(null);
@@ -319,6 +321,7 @@ export function ProjectBuilder({ open, onClose, initialCategoryId, onWantDesigne
       size="lg"
       full
       labelledBy="pb-title"
+      skin={skin}
       footer={
         showActions ? (
           <div>
@@ -355,7 +358,7 @@ export function ProjectBuilder({ open, onClose, initialCategoryId, onWantDesigne
     >
       <div className="px-5 pb-8 pt-4 sm:px-8 sm:pt-6">
         {step !== 'done' && (
-          <div className="sticky top-0 z-10 -mx-5 bg-white/95 px-5 pb-4 pt-1 backdrop-blur sm:-mx-8 sm:px-8">
+          <div data-sheet-footer className="sticky top-0 z-10 -mx-5 bg-white/95 px-5 pb-4 pt-1 backdrop-blur sm:-mx-8 sm:px-8">
             <div className="flex h-11 items-center gap-3 pr-12">
               {canGoBack ? (
                 <button
@@ -378,6 +381,7 @@ export function ProjectBuilder({ open, onClose, initialCategoryId, onWantDesigne
                 {STEP_ORDER.slice(0, 6).map((s, i) => (
                   <span
                     key={s}
+                    {...(i <= stepIndex ? { 'data-progress-done': '' } : { 'data-progress-todo': '' })}
                     className={`h-2 flex-1 rounded-full transition-colors duration-500 ${i <= stepIndex ? PROGRESS_INKS[i] : 'bg-ink-100'}`}
                   />
                 ))}
@@ -492,6 +496,7 @@ function OptionCard({
       type="button"
       onClick={onClick}
       aria-pressed={active}
+      data-option
       className={`group flex w-full items-center gap-4 rounded-3xl p-4 text-left transition-all duration-200 active:scale-[0.985] ${
         active ? 'bg-ink-950 text-white shadow-card' : 'bg-white ring-2 ring-inset ring-ink-100 hover:ring-ink-900'
       }`}
@@ -499,10 +504,11 @@ function OptionCard({
       {lead}
       <span className="min-w-0 flex-1">
         <span className="block font-display text-lg font-bold leading-tight">{title}</span>
-        {body && <span className={`mt-1 block text-sm leading-snug ${active ? 'text-white/70' : 'text-ink-600'}`}>{body}</span>}
-        {foot && <span className={`mt-1.5 block text-xs leading-snug ${active ? 'text-white/50' : 'text-ink-400'}`}>{foot}</span>}
+        {body && <span data-option-sub className={`mt-1 block text-sm leading-snug ${active ? 'text-white/70' : 'text-ink-600'}`}>{body}</span>}
+        {foot && <span data-option-sub className={`mt-1.5 block text-xs leading-snug ${active ? 'text-white/50' : 'text-ink-400'}`}>{foot}</span>}
       </span>
       <span
+        data-option-tick
         className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors ${
           active ? 'bg-sun-400 text-ink-950' : 'bg-ink-100 text-transparent group-hover:text-ink-400'
         }`}
@@ -523,6 +529,7 @@ function CategoryStep({ onPick }: { onPick: (id: string) => void }) {
             key={cat.id}
             type="button"
             onClick={() => onPick(cat.id)}
+            data-option
             className={`group relative flex min-h-[9.5rem] flex-col overflow-hidden rounded-3xl p-4 text-left transition-transform duration-200 hover:-translate-y-1 active:scale-[0.97] ${
               cat.isSpecial ? 'bg-ink-950 text-white' : `${TILE_TINTS[i % TILE_TINTS.length]} text-ink-950`
             }`}
@@ -532,7 +539,7 @@ function CategoryStep({ onPick }: { onPick: (id: string) => void }) {
               aria-hidden="true"
             />
             <span className="flex items-center justify-between">
-              <span className={`flex h-11 w-11 items-center justify-center rounded-2xl ${cat.isSpecial ? 'bg-white/10' : 'bg-white'}`}>
+              <span data-option-icon className={`flex h-11 w-11 items-center justify-center rounded-2xl ${cat.isSpecial ? 'bg-white/10' : 'bg-white'}`}>
                 <cat.icon className="h-6 w-6" strokeWidth={1.9} />
               </span>
               {cat.isSpecial && (
@@ -540,7 +547,7 @@ function CategoryStep({ onPick }: { onPick: (id: string) => void }) {
               )}
             </span>
             <span className="mt-auto pt-4 font-display text-[1.05rem] font-bold leading-tight">{cat.name}</span>
-            <span className={`mt-1 line-clamp-2 text-xs leading-snug ${cat.isSpecial ? 'text-white/60' : 'text-ink-700'}`}>{cat.tagline}</span>
+            <span data-option-sub className={`mt-1 line-clamp-2 text-xs leading-snug ${cat.isSpecial ? 'text-white/60' : 'text-ink-700'}`}>{cat.tagline}</span>
           </button>
         ))}
       </div>
@@ -582,6 +589,7 @@ function RecommendStep({
               body={rec.description}
               lead={
                 <span
+                  data-option-icon
                   className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-ink-950 ${
                     active ? 'bg-white' : TILE_TINTS[i % TILE_TINTS.length]
                   }`}

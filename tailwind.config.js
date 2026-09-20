@@ -9,60 +9,56 @@
  *
  * @type {import('tailwindcss').Config}
  */
+import plugin from 'tailwindcss/plugin.js';
+
+/*
+  Skins.
+
+  Four palettes (ink, paper, magenta, cyan) and the two font families are CSS variables rather than
+  fixed values, so a part of the page can be re-skinned by putting one class on a wrapper:
+
+    (nothing)   "Process"  — the app's own look: press inks, Bricolage Grotesque + Figtree.
+    .classic    "Classic"  — the original PrintAir website's look: warm paper, ember orange,
+                             Fraunces headlines + Plus Jakarta Sans. Same layout, same components.
+
+  Everything inside a `.classic` wrapper (including portalled sheets, which carry the class
+  themselves) picks the classic values up with no other code change. See src/styles/classic.css for
+  the handful of non-colour details (button gradient, headline weight, ornaments).
+*/
+const PROCESS = {
+  ink: { 50: '#f6f5fa', 100: '#eeecf5', 200: '#dfdcea', 300: '#c5c1d6', 400: '#9893b0', 500: '#716b8c', 600: '#565070', 700: '#403b57', 800: '#2a263d', 900: '#19162a', 950: '#0f0d1a' },
+  paper: { DEFAULT: '#ffffff', 50: '#ffffff', 100: '#fbfaff', 200: '#f6f5fa', 300: '#eeecf5' },
+  magenta: { 50: '#fff0f7', 100: '#ffe0ef', 200: '#ffc2e0', 300: '#ff94c8', 400: '#fb5aa9', 500: '#ee2a8b', 600: '#d6106f', 700: '#b20a5a', 800: '#8f0c4b', 900: '#5e0a33' },
+  cyan: { 50: '#ebfaff', 100: '#d0f3ff', 200: '#a3e6ff', 300: '#63d4fb', 400: '#22bdf0', 500: '#08a3dc', 600: '#0683b6', 700: '#0a6890', 800: '#0f5573', 900: '#0e3a50' },
+};
+
+/** The original website's tokens, mapped onto this app's palette names. magenta → ember, cyan → teal. */
+const CLASSIC = {
+  ink: { 50: '#f7f5f2', 100: '#ebe7e0', 200: '#d6cfc3', 300: '#b8ac9a', 400: '#978873', 500: '#7d6e5b', 600: '#665847', 700: '#54483b', 800: '#463d33', 900: '#322c25', 950: '#1c1714' },
+  paper: { DEFAULT: '#fefdfb', 50: '#fefdfb', 100: '#fdfbf7', 200: '#fbf8f3', 300: '#f5f0e8' },
+  magenta: { 50: '#fff8ed', 100: '#ffedd0', 200: '#fed7a0', 300: '#fdba6b', 400: '#fc9a3c', 500: '#f57c14', 600: '#de620a', 700: '#b8490b', 800: '#93390f', 900: '#78300f' },
+  cyan: { 50: '#f0fdfa', 100: '#ccfbf1', 200: '#99f6e4', 300: '#5eead4', 400: '#2dd4bf', 500: '#14b8a6', 600: '#0d9488', 700: '#0f766e', 800: '#115e59', 900: '#134e4a' },
+};
+
+const channels = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(' ');
+const vars = (skin) =>
+  Object.fromEntries(Object.entries(skin).flatMap(([name, shades]) => Object.entries(shades).map(([k, hex]) => [`--${name}-${k}`, channels(hex)])));
+const skinnable = (name) => Object.fromEntries(Object.keys(PROCESS[name]).map((k) => [k, `rgb(var(--${name}-${k}) / <alpha-value>)`]));
+
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       fontFamily: {
-        display: ['"Bricolage Grotesque Variable"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        sans: ['"Figtree Variable"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['var(--font-display)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       colors: {
-        ink: {
-          50: '#f6f5fa',
-          100: '#eeecf5',
-          200: '#dfdcea',
-          300: '#c5c1d6',
-          400: '#9893b0',
-          500: '#716b8c',
-          600: '#565070',
-          700: '#403b57',
-          800: '#2a263d',
-          900: '#19162a',
-          950: '#0f0d1a',
-        },
-        paper: {
-          DEFAULT: '#ffffff',
-          50: '#ffffff',
-          100: '#fbfaff',
-          200: '#f6f5fa',
-          300: '#eeecf5',
-        },
-        magenta: {
-          50: '#fff0f7',
-          100: '#ffe0ef',
-          200: '#ffc2e0',
-          300: '#ff94c8',
-          400: '#fb5aa9',
-          500: '#ee2a8b',
-          600: '#d6106f',
-          700: '#b20a5a',
-          800: '#8f0c4b',
-          900: '#5e0a33',
-        },
-        cyan: {
-          50: '#ebfaff',
-          100: '#d0f3ff',
-          200: '#a3e6ff',
-          300: '#63d4fb',
-          400: '#22bdf0',
-          500: '#08a3dc',
-          600: '#0683b6',
-          700: '#0a6890',
-          800: '#0f5573',
-          900: '#0e3a50',
-        },
+        ink: skinnable('ink'),
+        paper: skinnable('paper'),
+        magenta: skinnable('magenta'),
+        cyan: skinnable('cyan'),
         sun: {
           50: '#fffbe6',
           100: '#fff5bf',
@@ -186,5 +182,12 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    plugin(({ addBase }) =>
+      addBase({
+        ':root': { ...vars(PROCESS), '--font-display': '"Bricolage Grotesque Variable"', '--font-sans': '"Figtree Variable"' },
+        '.classic': { ...vars(CLASSIC), '--font-display': '"Fraunces Variable"', '--font-sans': '"Plus Jakarta Sans Variable"' },
+      }),
+    ),
+  ],
 };

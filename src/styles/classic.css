@@ -1,0 +1,152 @@
+/*
+  "Classic" skin — the original PrintAir website's look, applied to anything inside a `.classic`
+  wrapper. Colours and fonts are remapped in tailwind.config.js (CSS variables); this file holds
+  the few details variables can't express. Layout and behaviour are untouched.
+*/
+
+.classic {
+  color: rgb(var(--ink-900));
+  /* Restated because font-family is inherited as a computed value: without this, children keep the
+     face resolved on <body>, not the one the variable now points to. */
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Fraunces headlines: lighter, looser and calmer than Bricolage. */
+.classic h1,
+.classic h2,
+.classic h3,
+.classic h4,
+.classic .font-display {
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  line-height: 1.14;
+  font-variation-settings: normal;
+  font-optical-sizing: auto;
+}
+
+/* The wordmark is part of the logo, not a headline: it keeps its own face in every skin. */
+.classic [data-wordmark] {
+  font-family: 'Bricolage Grotesque Variable', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  font-variation-settings: 'wdth' 88;
+}
+
+/* Small uppercase section label, in ember like the website's "PROJECT BUILDER". */
+.classic .slug {
+  color: rgb(var(--magenta-600));
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+/* Sheets and dialogs sit on warm paper rather than white. */
+.classic[data-sheet],
+.classic [data-sheet] {
+  background-color: rgb(var(--paper-100));
+}
+.classic [data-sheet-footer] {
+  background-color: rgb(var(--paper-100) / 0.96);
+}
+
+/* The main action: the website's ember pill with its glow. */
+.classic [data-variant='primary'],
+.classic [data-variant='accent'],
+.classic [data-variant='dark'] {
+  background-color: rgb(var(--magenta-500));
+  background-image: linear-gradient(to bottom right, rgb(var(--magenta-400)), rgb(var(--magenta-600)));
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 8px 24px -8px rgb(var(--magenta-500) / 0.5);
+}
+.classic [data-variant='primary']:hover,
+.classic [data-variant='accent']:hover,
+.classic [data-variant='dark']:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 1px rgb(var(--magenta-500) / 0.15), 0 12px 40px -8px rgb(var(--magenta-500) / 0.35);
+}
+.classic [data-variant='secondary'],
+.classic [data-variant='outline'] {
+  font-weight: 600;
+  --tw-ring-shadow: inset 0 0 0 1px rgb(var(--ink-200));
+  background-color: rgb(var(--paper-50));
+}
+.classic [data-variant='secondary']:hover,
+.classic [data-variant='outline']:hover {
+  --tw-ring-shadow: inset 0 0 0 1px rgb(var(--ink-400));
+}
+.classic [data-variant='ghost'] {
+  font-weight: 600;
+}
+
+/* Inputs: hairline border, ember focus halo. */
+.classic .control {
+  border-width: 1px;
+  border-color: rgb(var(--ink-200));
+  border-radius: 0.875rem;
+  background-color: rgb(var(--paper-50));
+}
+.classic .control:focus {
+  border-color: rgb(var(--magenta-400));
+  box-shadow: 0 0 0 4px rgb(var(--magenta-500) / 0.14);
+}
+.classic :focus-visible {
+  outline-color: rgb(var(--magenta-400));
+}
+
+/* Option cards (categories, products, materials…): white, hairline, soft — not coloured tiles. */
+.classic [data-option] {
+  background-color: rgb(var(--paper-50));
+  background-image: none;
+  color: rgb(var(--ink-900));
+  box-shadow: inset 0 0 0 1px rgb(var(--ink-200) / 0.9), 0 2px 8px -2px rgb(28 23 20 / 0.06);
+  border-color: transparent;
+  --tw-ring-shadow: 0 0 #0000;
+}
+.classic [data-option]:hover {
+  box-shadow: inset 0 0 0 1px rgb(var(--magenta-300)), 0 8px 30px -8px rgb(28 23 20 / 0.12);
+}
+.classic [data-option][data-selected='true'],
+.classic [data-option][aria-pressed='true'],
+.classic [data-option][aria-checked='true'] {
+  background-color: rgb(var(--magenta-50));
+  box-shadow: inset 0 0 0 1.5px rgb(var(--magenta-400)), 0 8px 30px -8px rgb(var(--magenta-500) / 0.18);
+}
+.classic [data-option] [data-option-icon] {
+  background-color: rgb(var(--paper-300));
+  color: rgb(var(--ink-700));
+}
+.classic [data-option][data-selected='true'] [data-option-icon],
+.classic [data-option][aria-pressed='true'] [data-option-icon] {
+  background-color: rgb(var(--magenta-100));
+  color: rgb(var(--magenta-700));
+}
+
+/* Text inside an option card: always dark on light here, whatever Process does when selected. */
+.classic [data-option] .font-display {
+  color: rgb(var(--ink-950));
+}
+.classic [data-option] [data-option-sub] {
+  color: rgb(var(--ink-600));
+}
+.classic [data-option] [data-option-tick] {
+  background-color: rgb(var(--paper-300));
+}
+.classic [data-option][aria-pressed='true'] [data-option-tick] {
+  background-color: rgb(var(--magenta-500));
+  color: #fff;
+}
+
+/* Press-room ornaments belong to Process only. */
+.classic [data-ornament],
+.classic .bg-halftone,
+.classic .bg-halftone-lg {
+  display: none;
+}
+
+/* Progress: the website's ember segments. */
+.classic [data-progress-done] {
+  background-color: rgb(var(--magenta-500));
+}
+.classic [data-progress-todo] {
+  background-color: rgb(var(--ink-100));
+}
