@@ -17,16 +17,18 @@ There are **two front ends on one backend**:
 | Location on the owner's PC | `D:\All Apps\Printair` (app in `landing/`) | `D:\All Apps\printair-pwa` |
 | Upstream name / baseline | `printair_claude` @ `acd1751` | carried over from that commit |
 | Look | cream-and-ember | "Process" (CMYK press inks), phone-first |
-| Backend | **owns it**: Supabase migrations, RLS, RPCs, edge functions, PayMongo, emails | none — front end only, same Supabase project |
+| Backend | **owns it**: Supabase migrations, RLS, RPCs, edge functions, PayMongo, emails | unchanged **mirror** in `supabase/` + `tests/` + `scripts/seed.mjs` (copied 2026-09-20); same live Supabase project |
 
 The owner's brief, in order: make an installable PWA as a **totally separate repo**; give it a **totally different UI/UX**; **keep every feature**; keep the backend on Supabase, shared, unchanged. After a failed try with Base44 the owner said "follow your best instincts… make it the best" and later supplied their own logo ("use this as the logo, as-is").
+
+**Where the owner is now (2026-09-20):** they like both front ends — the PWA's design, and the website's Airbnb-style start flow and the simple way it guides people. They asked for the backend to be copied into this repo so it is complete on its own, and will compare the two and choose which to launch later. Do not retire or merge either until they decide.
 
 Four roles, all in scope: **customer, partner (printing), designer, admin**.
 
 ## 2. Hard rules (do not break these without the owner saying so)
 
 1. **Never modify `D:\All Apps\Printair`.** It is the website and the backend's source of truth. Read it for reference only.
-2. **No backend changes from this repo.** No migrations, no edge functions, no service-role key, ever. If the app needs a backend change, write it up in `docs/BACKEND-FOLLOWUPS.md` for the website repo and tell the owner.
+2. **One live backend, one place it is deployed from.** `supabase/` here is an unchanged mirror of the website repo's backend. There is still a single Supabase project behind both front ends, so until the owner chooses this repo as the final one: don't run `supabase db push` / `functions deploy` from here, don't edit the mirrored migrations or functions, and keep the mirror in step when the website repo's backend changes. Proposed backend changes go in `docs/BACKEND-FOLLOWUPS.md`. The service-role key is for local stacks only (seed, `test:backend`) and never goes near the browser or the web host. Details: `supabase/README.md`.
 3. **Logic is frozen; only presentation is ours.** `src/lib/**` and `src/contexts/**` are carried over byte-for-byte in intent. State, effects, handlers, API calls, validation, routes, status values and the order things happen in stay as the original had them. When the website's data layer changes, copy the regenerated `src/lib/api/database.types.ts` and changed `src/lib/api/*.ts` over — don't fork them.
 4. **Every feature stays.** `docs/FEATURE-INVENTORY.md` is the checklist: every field, button, state (loading / empty / error / not-found) and piece of helper copy from the original must still exist. Deliberate differences are listed at the bottom of `README.md`; add to that list when you make one.
 5. **No browser dialogs.** `confirm()` / `prompt()` / `alert()` are replaced by `useDialogs()` (`confirm`, `askReason`, `toast`). Control flow stays identical: `if (!(await confirm({...}))) return;`.
@@ -51,6 +53,8 @@ npm run dev         # real Supabase; needs .env (same two values as the website)
 npm run build && npm run preview   # http://localhost:4175 — the only way to see install / offline / update locally
 npm run check       # lint + typecheck + 76 unit tests + build. Must pass before every commit.
 npm run icons       # regenerate public/logo-mark.png and all icons from brand/printair-mark-source.png
+npm run seed        # sample data into a LOCAL Supabase stack (needs Docker + `npx supabase start`)
+npm run test:backend   # RLS / database-function / payment suites against a LOCAL stack; tests/local-only.ts refuses anything else
 ```
 
 `npm run check` currently reports one pre-existing lint **warning** (react-refresh, a file exporting a constant next to components). Zero errors is the bar.
@@ -66,7 +70,11 @@ public/                    logo-mark.png, icons/, apple-touch-icon.png, share-ca
 brand/                     printair-mark-source.png (the owner's logo), share-card.html (source of share-card.png)
 scripts/make-icons.mjs     cuts the logo out of its painted-in checkerboard backdrop, writes logo + every icon
 netlify.toml vercel.json   SPA rewrites + no-cache on sw.js / manifest for those hosts (Cloudflare uses public/_redirects, _headers)
-docs/                      this file, DESIGN-SYSTEM.md, FEATURE-INVENTORY.md, BACKEND-FOLLOWUPS.md
+docs/                      this file, DESIGN-SYSTEM.md, FEATURE-INVENTORY.md, BACKEND-FOLLOWUPS.md, backend/ (the website repo's engineering notes)
+supabase/       MIRROR     config.toml, 16 migrations, edge functions (create-booking-checkout, paymongo-webhook, send-notifications, chat-assistant, _shared). README.md there explains the rules
+tests/          MIRROR     marketplace + designer-marketplace suites, helpers, setup; local-only.ts is ours (guard)
+scripts/seed.mjs MIRROR    Philippine sample data for a local stack
+vitest.backend.config.ts   config for the backend suites (kept out of `npm test` because they need Docker)
 
 src/main.tsx               async start(): demo backend first if VITE_DEMO, then dynamic-imports the app; ErrorBoundary > BrowserRouter > AuthProvider > DialogsProvider
 src/App.tsx                all routes. Every page except LandingPage is React.lazy; <Suspense> wraps <Routes>
@@ -96,7 +104,7 @@ Admin `/admin`: index (users), `providers`, `designers`, `projects`, `quotes`, `
 
 Role layouts render `AppShell` once with `<Suspense><Outlet/></Suspense>` so tabs stay on screen while a page's code loads. `CustomerLayout` owns both builders and exposes `useCreate()` → `{ startProject, startDesign, version }`; `startDesign` navigates to `/dashboard/designs` first so the new request is visible when the form closes.
 
-### Backend surface the app calls (all defined in the website repo)
+### Backend surface the app calls (defined in `supabase/migrations` and `supabase/functions`, mirrored from the website repo)
 
 RPCs: `submit_project`, `cancel_project`, `submit_quote`, `withdraw_quote`, `select_quote`, `update_order_status`, `create_review`, `submit_design_request`, `cancel_design_request`, `submit_design_proposal`, `withdraw_design_proposal`, `select_design_proposal`, `submit_design_deliverable`, `review_design_deliverable`, `update_design_order_status`, `create_design_review`, `email_exists`, `admin_set_account_status`, `admin_review_designer`, `admin_moderate_review`, `admin_moderate_design_review`.
 Edge functions: `create-booking-checkout`, `paymongo-webhook` (called by the mock checkout page only; rejected server-side unless `PAYMONGO_MOCK=true`), `chat-assistant`, plus `send-notifications` server-side.
@@ -158,9 +166,13 @@ The harness scripts lived in a session scratchpad and are not in the repo. Worth
 
 Done: full redesign of every screen for all four roles with parity audited against the original (automated API-usage comparison plus an independent review, findings fixed); PWA layer; demo mode; owner's logo; story rail with arrows; always-visible install; pre-launch pass (code splitting, contrast, share card, robots.txt, legal drafts, honest inspiration section, assistant `inert` when closed).
 
+Backend mirrored into this repo on 2026-09-20 (34 files from `printair_claude` @ `acd1751`, copied from git so no secrets or local state came along). Lint, typecheck, unit tests and build pass with it in place; the backend suites were **not** run here (no Docker in the build sandbox) — CI has a `backend` job that will run them on the first push.
+
 **Not deployed yet.** No GitHub remote yet.
 
 ### Open — needs the owner
+
+0. **Which front end launches.** The owner is comparing this PWA with the original website. One idea worth offering: bring the website's Airbnb-style guided start flow into the PWA's design, so they don't have to choose between them.
 
 1. **Legal.** Fill `src/data/legal.ts` (registered name, address, contact email, platform-fee refund rule — deliberately blank, it is a business decision), have `/privacy` and `/terms` reviewed by someone qualified in Philippine law, set `reviewed: true`. Until then both pages show "Draft" and the build warns. The drafts were written from what the code does; do not add policy the owner hasn't decided.
 2. **Checkout return.** `create-booking-checkout` builds PayMongo's return link from the `SITE_URL` secret, so someone paying from the PWA lands on the *website's* `/checkout/return`. Payment still settles by webhook. Either serve the PWA at `SITE_URL`, or apply the allowlisted `return_origin` change in `docs/BACKEND-FOLLOWUPS.md` (in the website repo).

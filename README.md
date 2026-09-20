@@ -4,16 +4,18 @@ The installable app version of PrintAir, the print-services marketplace for the 
 
 This is a **separate repo** from the PrintAir website (`printair_claude`). It has its own look, "Process", built on the four press inks, and it installs to a phone or desktop like a native app. It does everything the website does.
 
+It is also **complete on its own**: the backend code (database migrations, security rules, edge functions, the backend test suites and the seed script) is mirrored here in [`supabase/`](supabase/README.md), `tests/` and `scripts/seed.mjs`, so the owner can compare the two front ends side by side and launch whichever one they choose. Read `supabase/README.md` before deploying anything from that folder — there is still only one live backend.
+
 ## How it relates to the website
 
 | | Website (`printair_claude/landing`) | This repo |
 |---|---|---|
 | Screens, navigation, styling | Original cream-and-ember design | New "Process" design, phone-first, bottom tabs and sheets |
 | Logic and data layer (`src/lib`, `src/contexts`) | Source | Carried over unchanged |
-| Backend (Supabase schema, security rules, edge functions, PayMongo, emails) | **Lives there, and only there** | None. Uses the same Supabase project |
+| Backend (Supabase schema, security rules, edge functions, PayMongo, emails) | Source, and for now the only repo backend changes are deployed from | Unchanged mirror in `supabase/` (copied 2026-09-20 from `acd1751`). Same live Supabase project |
 | Accounts and data | Shared | Shared |
 
-Because both front ends point at the same Supabase project, someone can start a project on the website and finish it in the app. When the database changes, change it in the website repo's `supabase/migrations/`, then copy the regenerated `src/lib/api/database.types.ts` and any changed `src/lib/api/*.ts` files here.
+Because both front ends point at the same Supabase project, someone can start a project on the website and finish it in the app. When the database changes, change it in the website repo's `supabase/migrations/`, then copy the new migration and function files into this repo's `supabase/`, along with the regenerated `src/lib/api/database.types.ts` and any changed `src/lib/api/*.ts` files. (If this repo is chosen as the final one, that direction flips and `supabase/` here becomes the source of truth.)
 
 ## Try it with sample data (no backend needed)
 
@@ -49,7 +51,13 @@ npm run preview          # http://localhost:4175
 npm run check            # lint + typecheck + unit tests + build
 ```
 
-The unit tests cover the client-side validation and the dimensions parser. The end-to-end suites that exercise row-level security stay with the backend, in the website repo.
+The unit tests cover the client-side validation and the dimensions parser. The backend suites that exercise row-level security, the database functions and the payment flow are in `tests/`; they need Docker and a local Supabase stack, so they run separately:
+
+```bash
+npx supabase start        # then copy API URL, anon key and service_role key into .env
+npm run seed              # optional sample data
+npm run test:backend      # refuses to run against anything but a local stack
+```
 
 ## Deploy
 
@@ -99,7 +107,11 @@ src/
   components/shell/  AppShell (tabs / side rail), PublicShell, AccountSheet
   pages/          one folder per role, plus public pages
   pwa/            install prompt, update toast, offline screen, /app entry
+supabase/        backend mirror: migrations, edge functions, config (see supabase/README.md)
+tests/           backend suites (npm run test:backend)
+scripts/         make-icons.mjs, seed.mjs
 docs/
+  backend/                the website repo's engineering notes
   AGENT-HANDOFF.md        start here if you are picking this repo up (person or AI agent)
   DESIGN-SYSTEM.md        tokens, kit, patterns, and the rules that keep parity
   FEATURE-INVENTORY.md every feature, as a checklist against the original

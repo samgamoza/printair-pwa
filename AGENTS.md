@@ -4,7 +4,7 @@ Start with **[docs/AGENT-HANDOFF.md](docs/AGENT-HANDOFF.md)** — what this is, 
 
 The rules that matter most:
 
-- This is the PrintAir **PWA front end only**. The backend (Supabase migrations, RLS, RPCs, edge functions, PayMongo) lives in the separate website repo and is never changed from here. Never touch `D:\All Apps\Printair`.
+- This is the PrintAir PWA front end **plus an unchanged mirror of the backend** (`supabase/`, `tests/`, `scripts/seed.mjs`). There is still one live Supabase project shared with the website; until the owner picks a front end, backend changes are made and deployed from the website repo only, then copied here. Read `supabase/README.md`. Never touch `D:\All Apps\Printair`.
 - `src/lib/**` and `src/contexts/**` are carried over from the website and are **frozen**; only screens and presentation are ours. Every original feature must survive (`docs/FEATURE-INVENTORY.md`).
 - Use the kit in `src/components/ui`; no browser `confirm` / `prompt` / `alert`; phone-first.
 - The logo is the owner's artwork, used as-is.

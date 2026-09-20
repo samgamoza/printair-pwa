@@ -1,8 +1,8 @@
 import { defineConfig } from 'vitest/config';
 import { fileURLToPath, URL } from 'node:url';
 
-// Only the pure client-side helpers are tested here. The end-to-end suites that
-// exercise row-level security live with the backend, in the original repo.
+// The fast unit tests: pure client-side helpers, no network. The backend suites that exercise
+// row-level security against a local Supabase stack have their own config, vitest.backend.config.ts.
 export default defineConfig({
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },

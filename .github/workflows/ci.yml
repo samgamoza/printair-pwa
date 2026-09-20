@@ -23,3 +23,28 @@ jobs:
           # The build only needs these to be present; CI never talks to a real project.
           VITE_SUPABASE_URL: http://127.0.0.1:54321
           VITE_SUPABASE_ANON_KEY: ci-placeholder
+
+  backend:
+    # The security and payment suites, against a throwaway local Supabase stack built from
+    # supabase/migrations/. Same job the website repo runs.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Start local Supabase (applies supabase/migrations/)
+        run: supabase start
+      - name: Export local Supabase connection details
+        run: |
+          supabase status -o env \
+            --override-name api.url=VITE_SUPABASE_URL \
+            --override-name auth.anon_key=VITE_SUPABASE_ANON_KEY \
+            --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY \
+            >> "$GITHUB_ENV"
+      - run: npm run test:backend

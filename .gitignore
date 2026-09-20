@@ -20,3 +20,11 @@ Thumbs.db
 
 # Local agent/editor state can hold API tokens in plaintext.
 .claude/settings.local.json
+
+# Supabase CLI local runtime state: container state, generated secrets, branch metadata.
+# supabase/migrations/ is the portable, committed source of truth.
+supabase/.temp
+supabase/.branches
+
+# Local copy of the notification dispatch secret (also a Supabase secret).
+.notify-secret.tmp
