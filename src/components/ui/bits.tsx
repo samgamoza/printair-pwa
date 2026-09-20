@@ -196,16 +196,25 @@ export function FileRow({
       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-ink-600 ring-1 ring-ink-900/5">
         <Paperclip className="h-5 w-5" />
       </span>
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-bold text-ink-900">{name}</p>
-        <p className="text-xs text-ink-500">{meta ?? formatBytes(size)}</p>
-      </div>
+      {onDownload ? (
+        // The name is the download too, not just the small icon — "Tap to download" means the row.
+        <button type="button" onClick={onDownload} disabled={busy} className="min-w-0 flex-1 text-left disabled:opacity-60">
+          <span className="block truncate text-sm font-bold text-ink-900">{name}</span>
+          <span className="block text-xs text-ink-500">{meta ?? formatBytes(size)}</span>
+        </button>
+      ) : (
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-bold text-ink-900">{name}</p>
+          <p className="text-xs text-ink-500">{meta ?? formatBytes(size)}</p>
+        </div>
+      )}
       {onDownload && (
         <button
           type="button"
           onClick={onDownload}
           disabled={busy}
-          aria-label={`Download ${name}`}
+          aria-hidden="true"
+          tabIndex={-1}
           className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-ink-700 hover:bg-white disabled:opacity-60"
         >
           {busy ? <InkLoader className="[&>span]:h-1.5 [&>span]:w-1.5" /> : <Download className="h-5 w-5" />}

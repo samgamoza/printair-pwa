@@ -16,7 +16,7 @@ export const LEGAL = {
   /** Registered business address. */
   address: '',
   /** Where privacy requests and questions go. */
-  email: '',
+  email: 'hello@printair.ph', // the address the website's footer already publishes — confirm it is the right one for privacy requests
   /** Shown as "Last updated". */
   updated: 'September 2026',
   /**

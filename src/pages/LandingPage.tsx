@@ -1,9 +1,10 @@
-import { lazy, Suspense, useState, useCallback, useEffect } from 'react';
+import { lazy, Suspense, useState, useCallback, useEffect, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ArrowRight, Check, Clock, Cpu, MapPin, Palette, Printer, ShieldCheck, TrendingUp, Users } from 'lucide-react';
+import { ArrowRight, Check, Clock, Compass, Cpu, MapPin, Palette, Printer, ShieldCheck, TrendingUp, Users } from 'lucide-react';
 import { MarketingHeader, MarketingFooter } from '@/components/marketing/Chrome';
 import { Button } from '@/components/ui/Button';
 import { Rail } from '@/components/ui/Rail';
+import { FilterTabs } from '@/components/ui/bits';
 import { ColorBar, CropMarks, RegistrationMark } from '@/components/ui/Marks';
 import { InstallBanner } from '@/pwa/InstallPrompt';
 import { useAuth } from '@/contexts/AuthContext';
@@ -21,6 +22,10 @@ const Assistant = lazy(() => import('@/components/Assistant').then((m) => ({ def
  * section goes back to "Made with PrintAir" with each customer's place and quote.
  */
 const STORIES_ARE_REAL = false;
+
+/** The same filters the website offers over the inspiration cards. */
+const STORY_FILTERS = ['All', 'Coffee Shop', 'Bakery', 'Beauty and Skincare', 'Retail', 'Product Packaging', 'Labels and Stickers'] as const;
+type StoryFilter = (typeof STORY_FILTERS)[number];
 
 const TILE_TINTS = ['bg-cyan-200', 'bg-magenta-200', 'bg-sun-200', 'bg-grape-200', 'bg-leaf-200'];
 
@@ -49,12 +54,17 @@ function categoryIdFor(name: string): string | undefined {
 }
 
 export default function LandingPage() {
-  const { openJoinPartner, openSignIn, session } = useAuth();
+  const { openJoinPartner } = useAuth();
   const [builderOpen, setBuilderOpen] = useState(false);
   const [initialCategory, setInitialCategory] = useState<string | null>(null);
+  const [storyFilter, setStoryFilter] = useState<StoryFilter>('All');
+  const stories = useMemo(
+    () => (storyFilter === 'All' ? INSPIRATION_ITEMS : INSPIRATION_ITEMS.filter((i) => i.category === storyFilter)),
+    [storyFilter],
+  );
   const [builderWanted, setBuilderWanted] = useState(false);
   const [assistantReady, setAssistantReady] = useState(false);
-  const { hash } = useLocation();
+  const { hash, key: navKey } = useLocation();
 
   // In-app links such as Help ("/#how") arrive by client-side navigation, which never scrolls
   // to an anchor on its own.
@@ -62,7 +72,8 @@ export default function LandingPage() {
     if (!hash) return;
     const t = window.setTimeout(() => document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
     return () => window.clearTimeout(t);
-  }, [hash]);
+    // navKey: tapping the same link again (Help, while already on /#how) should scroll again.
+  }, [hash, navKey]);
 
   useEffect(() => {
     const t = window.setTimeout(() => {
@@ -112,11 +123,14 @@ export default function LandingPage() {
                 <Button variant="accent" size="lg" onClick={() => openBuilder()} iconRight={<ArrowRight className="h-5 w-5" />}>
                   Start a project
                 </Button>
-                {!session && (
-                  <Button variant="secondary" size="lg" onClick={() => openSignIn()}>
-                    Log in
-                  </Button>
-                )}
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  icon={<Compass className="h-5 w-5" />}
+                  onClick={() => document.getElementById('inspiration')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                >
+                  Explore print ideas
+                </Button>
               </div>
               <ul className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-sm font-bold text-ink-700">
                 {['Free to post', 'Compare real quotations', 'Track to delivery'].map((t) => (
@@ -193,7 +207,9 @@ export default function LandingPage() {
         {/* ---------- Stories ---------- */}
         <section id="inspiration" className="scroll-mt-20 py-14 lg:py-20">
           <Rail
+            key={storyFilter}
             label={STORIES_ARE_REAL ? 'customer stories' : 'ideas'}
+            below={<FilterTabs value={storyFilter} onChange={setStoryFilter} tabs={STORY_FILTERS.map((f) => ({ key: f, label: f }))} />}
             header={
               <>
                 <p className="slug text-grape-600">Inspiration</p>
@@ -202,7 +218,7 @@ export default function LandingPage() {
               </>
             }
           >
-            {INSPIRATION_ITEMS.map((item, i) => (
+            {stories.map((item, i) => (
               <article
                 key={item.title}
                 className="flex w-[19rem] shrink-0 snap-start flex-col overflow-hidden rounded-4xl bg-white shadow-soft ring-1 ring-ink-900/5 sm:w-[22rem]"

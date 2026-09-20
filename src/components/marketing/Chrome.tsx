@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { CircleUserRound } from 'lucide-react';
+import { CircleUserRound, Mail, MapPin } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ROLE_HOME } from '@/routes/roles';
 import { Logo, ColorBar } from '@/components/ui/Marks';
@@ -8,6 +8,9 @@ import { Avatar } from '@/components/ui/bits';
 import { Button } from '@/components/ui/Button';
 import { AccountSheet } from '@/components/shell/AccountSheet';
 import { GetAppButton } from '@/pwa/InstallPrompt';
+
+/** The address the website publishes in its footer — the only contact point people are given. */
+const CONTACT_EMAIL = 'hello@printair.ph';
 
 /** Top bar for the two welcome pages. */
 export function MarketingHeader() {
@@ -23,6 +26,14 @@ export function MarketingHeader() {
             <Logo />
           </Link>
           <nav className="mr-2 hidden items-center gap-1 md:flex" aria-label="Sections">
+            {/* In-page sections, as on the website. Plain anchors: "/#how" works from any page, and the
+                landing page scrolls to the hash itself after a client-side navigation. */}
+            <Link to="/#how" className="hidden rounded-full px-4 py-2 text-sm font-bold text-ink-600 hover:bg-ink-100 hover:text-ink-950 lg:block">
+              How it works
+            </Link>
+            <Link to="/#inspiration" className="hidden rounded-full px-4 py-2 text-sm font-bold text-ink-600 hover:bg-ink-100 hover:text-ink-950 lg:block">
+              Inspiration
+            </Link>
             <Link to="/partners" className="rounded-full px-4 py-2 text-sm font-bold text-ink-600 hover:bg-ink-100 hover:text-ink-950">
               Printing partners
             </Link>
@@ -88,6 +99,12 @@ export function MarketingFooter() {
             <a href="/#how" className={link}>
               How it works
             </a>
+            <a href="/#builder" className={link}>
+              Project builder
+            </a>
+            <a href="/#inspiration" className={link}>
+              Inspiration
+            </a>
             <GetAppButton className={`${link} flex items-center gap-2 text-left`} />
           </div>
         </div>
@@ -101,10 +118,19 @@ export function MarketingFooter() {
               Apply as a designer
             </Link>
           </div>
+          <div className="mt-4 space-y-2 text-sm text-white/60">
+            <a href={`mailto:${CONTACT_EMAIL}`} className="flex items-center gap-2 hover:text-white">
+              <Mail className="h-4 w-4 text-white/40" /> {CONTACT_EMAIL}
+            </a>
+            <p className="flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-white/40" /> Metro Manila, Philippines
+            </p>
+          </div>
         </div>
       </div>
       <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-4 border-t border-white/10 px-5 py-6 sm:px-8">
         <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white/60">
+          <span>&copy; {new Date().getFullYear()} PrintAir. Your AI Printing Partner.</span>
           <span>Made in the Philippines</span>
           <Link to="/privacy" className="underline-offset-4 hover:text-white hover:underline">
             Privacy

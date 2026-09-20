@@ -128,3 +128,7 @@ docs/
 - "Send password reset link" is in every role's account menu (the original offered it only in Partner Settings).
 - Public profiles gain a call to action: "Start a project" on a partner, "Request a design" on a designer (customers and visitors only).
 - Starting a design request from anywhere in the customer area moves to My Designs first, so the new request is on screen when the form closes.
+- The welcome page is one page rather than a stack of marketing sections. Left out on purpose, because they were decoration or sample content rather than features: the scrolling marquee, the navbar's scroll-spy and progress bar, the four sample partner cards with count-up statistics (the real directory is one tap away), and the "featured" builder preview card. Everything a visitor can *do* there is kept: start a project (from the hero, a category, or an idea card), filter the ideas, explore, reach both directories, join as a partner or designer, read how it works, and find the contact address.
+- `/app` (the installed app's start address) did not exist on the website. Opened offline with a saved sign-in it shows the offline screen and recovers when the connection returns.
+
+Last full parity pass against the website: 2026-09-20 (every page and stateful component compared function by function; `src/contexts` byte-identical, `src/lib` identical apart from a no-op regex escape and two added files).

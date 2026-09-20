@@ -10,6 +10,7 @@ import { ColorBar, Halftone, RegistrationMark } from '@/components/ui/Marks';
 import { getPartnerPublicProfile, type PartnerDirectoryRow } from '@/lib/api/directory';
 import { getProviderReviews, type ReviewRow } from '@/lib/api/reviews';
 import { CATEGORIES } from '@/data/catalog';
+import { useAuth } from '@/contexts/AuthContext';
 
 const BACK = { to: '/partners', label: 'All partners' };
 
@@ -19,6 +20,7 @@ function categoryName(id: string) {
 
 export default function PartnerPublicProfilePage() {
   const { id } = useParams<{ id: string }>();
+  const { profile } = useAuth();
   const [partner, setPartner] = useState<PartnerDirectoryRow | null | undefined>(undefined);
   const [reviews, setReviews] = useState<ReviewRow[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -141,11 +143,14 @@ export default function PartnerPublicProfilePage() {
             )}
           </div>
 
-          <div className="mt-6">
-            <ButtonLink to="/#builder" variant="accent" size="lg" iconRight={<ArrowRight className="h-5 w-5" />} className="w-full sm:w-auto">
-              Start a project
-            </ButtonLink>
-          </div>
+          {/* For people who buy printing: visitors and customers. A partner, designer or admin has no use for it. */}
+          {(!profile || profile.role === 'customer') && (
+            <div className="mt-6">
+              <ButtonLink to="/#builder" variant="accent" size="lg" iconRight={<ArrowRight className="h-5 w-5" />} className="w-full sm:w-auto">
+                Start a project
+              </ButtonLink>
+            </div>
+          )}
         </div>
       </section>
 

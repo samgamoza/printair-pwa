@@ -12,12 +12,15 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
  */
 export function Rail({
   header,
+  below,
   children,
   label,
   className = '',
 }: {
   /** Left side of the header row: the slug and heading. */
   header: ReactNode;
+  /** Optional row between the header and the cards, e.g. filters. */
+  below?: ReactNode;
   children: ReactNode;
   /** What the row holds, for screen readers: "Customer stories". */
   label: string;
@@ -77,7 +80,9 @@ export function Rail({
         )}
       </div>
 
-      <div className="relative mt-8 lg:mx-auto lg:max-w-6xl">
+      {below && <div className="mx-auto mt-6 max-w-6xl px-5 sm:px-8">{below}</div>}
+
+      <div className={`relative lg:mx-auto lg:max-w-6xl ${below ? 'mt-5' : 'mt-8'}`}>
         <div
           ref={scroller}
           role="group"

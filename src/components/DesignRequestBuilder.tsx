@@ -61,14 +61,17 @@ export function DesignRequestBuilder({ open, onClose }: { open: boolean; onClose
 
   function addFiles(list: FileList | null) {
     if (!list?.length) return;
-    for (const file of Array.from(list)) {
+    // Copied out now: the picker is cleared right after this returns, which empties the FileList,
+    // and React may not run the state updater below until later.
+    const picked = Array.from(list);
+    for (const file of picked) {
       const problem = validateBriefFile(file);
       if (problem) {
         setError(`${file.name}: ${problem}`);
         return;
       }
     }
-    setFiles((prev) => [...prev, ...Array.from(list)]);
+    setFiles((prev) => [...prev, ...picked]);
   }
 
   async function handleSubmit() {
