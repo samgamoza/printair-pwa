@@ -100,6 +100,7 @@ src/
   pages/          one folder per role, plus public pages
   pwa/            install prompt, update toast, offline screen, /app entry
 docs/
+  AGENT-HANDOFF.md        start here if you are picking this repo up (person or AI agent)
   DESIGN-SYSTEM.md        tokens, kit, patterns, and the rules that keep parity
   FEATURE-INVENTORY.md every feature, as a checklist against the original
 ```
