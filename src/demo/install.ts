@@ -198,6 +198,21 @@ function handleRpc(name: string, args: Row): Response {
     case 'email_exists':
       return json(Object.values(USERS).some((u) => u.email === args.p_email));
 
+    // Sample marketplace activity, for the demo only. The real function (docs/BACKEND-FOLLOWUPS.md §6)
+    // returns the same shape from real rows, with names already stripped on the server.
+    case 'public_activity': {
+      const minsAgo = (m: number) => new Date(Date.now() - m * 60_000).toISOString();
+      return json({
+        delivered_total: 127,
+        events: [
+          { id: 'a1', kind: 'project_posted', category: 'coffee', city: 'Pasig City', at: minsAgo(3) },
+          { id: 'a2', kind: 'quotes_received', category: 'bakery', city: 'Cebu City', quotes: 3, at: minsAgo(18) },
+          { id: 'a3', kind: 'order_delivered', category: 'beauty', city: 'Quezon City', partner: 'Manila Offset Press', at: minsAgo(52) },
+          { id: 'a4', kind: 'project_posted', category: 'food', city: 'Davao City', at: minsAgo(140) },
+        ],
+      });
+    }
+
     case 'submit_project':
     case 'cancel_project': {
       const project = find('projects', args.p_project_id);

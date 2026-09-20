@@ -113,6 +113,7 @@ Added for the people it is for: owners of small Filipino businesses, on their ph
 - **Top-rated printing partners** on the welcome page, from real reviews only.
 - **Order progress the way a delivery app tells it:** one friendly sentence and a bar that fills. The dated timeline stays as the record.
 - **Sounds, a small vibration and confetti** for the good moments (a new quote, payment received, delivered). Once per event, off with one switch, skipped for reduced motion.
+- **Happening on PrintAir.** A small, silent line about something real that just happened ("A coffee shop in Pasig City just posted a print project"): business type and city only, never a name or an order's details. Off until the backend function in `docs/BACKEND-FOLLOWUPS.md` §6 exists; then set `VITE_ACTIVITY_FEED=1`.
 - **Dark mode (Beta).**
 
 The logo is the supplied artwork in `brand/printair-mark-source.png`. `npm run icons` cuts it out onto a transparent background (`public/logo-mark.png`, used inside the app) and makes every icon size from it. Replace that one file and re-run to change the logo everywhere.

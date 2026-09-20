@@ -11,6 +11,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { isConstrained, whenIdleAndUnconstrained } from '@/pwa/connection';
 import { SeasonKits } from '@/delight/SeasonKits';
 import { TopPartners } from '@/delight/TopPartners';
+import { ActivityPill } from '@/delight/ActivityPill';
+import { DeliveredTotal } from '@/delight/DeliveredTotal';
 import { CATEGORIES, INSPIRATION_ITEMS } from '@/data/catalog';
 
 // The builder and the assistant are the two heaviest things on this page and neither is needed to
@@ -380,6 +382,7 @@ export default function LandingPage() {
           </Rail>
         </section>
 
+        <DeliveredTotal />
         <TopPartners />
 
         {/* ---------- Two doors ---------- */}
@@ -456,6 +459,7 @@ export default function LandingPage() {
 
       <Suspense fallback={null}>
         {builderWanted && <ProjectBuilder open={builderOpen} onClose={closeBuilder} initialCategoryId={initialCategory} />}
+        <ActivityPill />
         {assistantReady && <Assistant onOpenBuilder={openBuilder} onOpenProvider={openJoinPartner} />}
       </Suspense>
     </div>

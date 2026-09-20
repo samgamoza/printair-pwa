@@ -13,6 +13,7 @@ import { CATEGORIES } from '@/data/catalog';
 import { formatDate } from '@/lib/format';
 import { useCreate } from './createContext';
 import { SukiCard } from '@/delight/SukiCard';
+import { ActivityPill } from '@/delight/ActivityPill';
 import { SeasonKits } from '@/delight/SeasonKits';
 
 const FILTERS: { key: string; label: string; statuses: string[] }[] = [
@@ -97,6 +98,7 @@ export default function ProjectsListPage() {
 
   return (
     <>
+      <ActivityPill inShell />
       <PageHeader
         title={firstName ? `Hi ${firstName}, what's printing?` : 'My Projects'}
         subtitle="Track every printing project from draft to delivery."

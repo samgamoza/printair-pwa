@@ -67,3 +67,64 @@ Added 2026-09-20 in `src/delight/`. Everything below works now without any backe
 | **Sounds, confetti, Taglish, dark mode** | Saved on the device only (`localStorage`, key `printair.prefs`). | Nothing needed. Saving them to the profile would make them follow the person across devices. |
 
 Web push ("You have a new quote") is still the single most valuable missing piece for an installed app; it is described at the end of section 4.
+
+## 6. "Happening on PrintAir": the public activity function
+
+**What the front end has (2026-09-20).** `src/delight/activity.ts`, `ActivityPill.tsx` and `DeliveredTotal.tsx`: a small, silent pill on the welcome page and the customer dashboard ("A coffee shop in Pasig City just posted a print project · 3 min ago"), and a delivered-orders total on the welcome page once it reaches 50. Both are **off** until `VITE_ACTIVITY_FEED=1` is set on the host; with it unset no request is made. Demo mode shows sample events.
+
+**The rules, which the backend must enforce rather than trust the browser with:**
+
+- Real events only. Never seed, pad or replay. A quiet marketplace shows nothing.
+- Nobody identifiable. Send the project's **category id** and **delivery city** only. Never the customer's name, the project's title or description (free text; it may contain a brand name) or an exact quantity. Partner business names may be sent: they are already public in the directory.
+- Only the last 48 hours, newest first, at most 12 rows.
+- Worth considering before launch: leave out a city until at least a few projects have come from it, so "a bakery in a small town" cannot point at one shop.
+- Tell customers. Add one line to the privacy page when this goes live ("we may show that a business of your type in your city used PrintAir, never your name or order details"), and have it looked at with the rest of the legal review.
+
+**The change (website repo, new migration).** One read-only function, callable by anyone, that builds the list on the server. Written from the schema as mirrored here, and **not yet run**: test it on a local stack, and add a case to the marketplace suite proving that no name, title or quantity appears in its output.
+
+```sql
+create or replace function public.public_activity()
+returns jsonb
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  with posted as (
+    select 'p-' || p.id as id, 'project_posted' as kind, p.category, p.delivery_city as city,
+           null::int as quotes, null::text as partner, p.updated_at as at
+    from projects p
+    where p.status = 'OPEN_FOR_QUOTES' and p.updated_at > now() - interval '48 hours'
+  ),
+  quoted as (
+    select 'q-' || p.id as id, 'quotes_received' as kind, p.category, p.delivery_city as city,
+           count(q.id)::int as quotes, null::text as partner, max(q.created_at) as at
+    from quotes q join projects p on p.id = q.project_id
+    where q.created_at > now() - interval '48 hours'
+    group by p.id, p.category, p.delivery_city
+  ),
+  delivered as (
+    select 'o-' || o.id as id, 'order_delivered' as kind, p.category, null::text as city,
+           null::int as quotes, pp.business_name as partner, o.delivered_at as at
+    from orders o
+    join projects p on p.id = o.project_id
+    join partner_profiles pp on pp.id = o.partner_id
+    where o.status = 'DELIVERED' and o.delivered_at > now() - interval '48 hours'
+  ),
+  feed as (
+    select * from posted union all select * from quoted union all select * from delivered
+    order by at desc limit 12
+  )
+  select jsonb_build_object(
+    'events', coalesce((select jsonb_agg(to_jsonb(feed) order by at desc) from feed), '[]'::jsonb),
+    'delivered_total', (select count(*) from orders where status = 'DELIVERED')
+  );
+$$;
+
+revoke all on function public.public_activity() from public;
+grant execute on function public.public_activity() to anon, authenticated;
+```
+
+The front end already drops anything that is not one of the three kinds, is older than 48 hours or is dated in the future, so a mistake here shows nothing rather than something wrong.
+
+**Later, if wanted.** Supabase Realtime could push new events to open pages instead of one fetch per visit. Not needed for the effect, and it would mean a public broadcast channel to secure.

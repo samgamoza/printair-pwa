@@ -4,6 +4,7 @@ import { readBudget, stripBudget, withBudget } from './budget';
 import { SEASON_KITS, activeKits } from './seasons';
 import { sukiFor } from './suki';
 import { isPreviewable, isTrackable } from './checks';
+import { ago, describe as say, usable, type ActivityEvent } from './activity';
 
 describe('budget line in notes', () => {
   it('adds a labelled line and reads it back', () => {
@@ -61,5 +62,34 @@ describe('checks', () => {
     expect(isPreviewable({ type: 'image/png' } as File)).toBe(true);
     expect(isPreviewable({ type: 'application/pdf' } as File)).toBe(false);
     expect(isPreviewable(null)).toBe(false);
+  });
+});
+
+describe('marketplace activity', () => {
+  const now = new Date(2026, 8, 20, 12).getTime();
+  const at = (mins: number) => new Date(now - mins * 60_000).toISOString();
+  it('describes a business type and a city, never a person', () => {
+    expect(say({ id: '1', kind: 'project_posted', category: 'coffee', city: 'Pasig City', at: at(1) })).toBe('A coffee shop in Pasig City just posted a print project');
+    expect(say({ id: '2', kind: 'quotes_received', category: 'bakery', city: null, quotes: 3, at: at(1) })).toBe('A bakery just received 3 quotes');
+    expect(say({ id: '3', kind: 'quotes_received', category: 'unknown', city: 'Cebu City', quotes: 1, at: at(1) })).toBe('A business in Cebu City just received a quote');
+    expect(say({ id: '4', kind: 'order_delivered', category: null, city: null, partner: 'Manila Offset Press', at: at(1) })).toBe('Manila Offset Press just delivered an order');
+  });
+  it('drops anything stale, from the future or malformed', () => {
+    const events = [
+      { id: 'old', kind: 'project_posted', category: 'coffee', city: 'X', at: at(60 * 49) },
+      { id: 'ok', kind: 'project_posted', category: 'coffee', city: 'X', at: at(30) },
+      { id: 'newer', kind: 'order_delivered', category: null, city: null, at: at(5) },
+      { id: 'future', kind: 'project_posted', category: null, city: null, at: at(-600) },
+      { id: 'odd', kind: 'mary_ordered_5000_boxes', at: at(1) },
+      null,
+    ] as unknown as ActivityEvent[];
+    expect(usable(events, now).map((e) => e.id)).toEqual(['newer', 'ok']);
+    expect(usable('nope', now)).toEqual([]);
+  });
+  it('says how long ago in plain words', () => {
+    expect(ago(at(0), now)).toBe('just now');
+    expect(ago(at(18), now)).toBe('18 min ago');
+    expect(ago(at(180), now)).toBe('3 hr ago');
+    expect(ago(at(60 * 30), now)).toBe('yesterday');
   });
 });
