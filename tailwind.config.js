@@ -82,6 +82,8 @@ export default {
         display: ['var(--font-display)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         sans: ['var(--font-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        // The "PrintAir" wordmark only (Marks.tsx). Not swapped by `.classic`: see --font-wordmark below.
+        wordmark: ['var(--font-wordmark)', 'var(--font-display)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       colors: {
         white: 'rgb(var(--white-DEFAULT) / <alpha-value>)',
@@ -193,7 +195,14 @@ export default {
   plugins: [
     plugin(({ addBase }) =>
       addBase({
-        ':root': { ...vars(PROCESS), '--font-display': '"Bricolage Grotesque Variable"', '--font-sans': '"Figtree Variable"' },
+        // '--font-wordmark' is set once here, never inside '.classic': the "PrintAir" logotype is
+        // fixed brand identity, not a themable surface, so it stays the same face in every skin.
+        ':root': {
+          ...vars(PROCESS),
+          '--font-display': '"Bricolage Grotesque Variable"',
+          '--font-sans': '"Figtree Variable"',
+          '--font-wordmark': '"Unbounded Variable"',
+        },
         '.classic': { ...vars(CLASSIC), '--font-display': '"Fraunces Variable"', '--font-sans': '"Plus Jakarta Sans Variable"' },
         // After .classic on purpose: with both on, dark wins the colours and Classic keeps its fonts.
         '.dark, .dark .classic': { ...vars(DARK), 'color-scheme': 'dark', '--pip-navy': '#6b7488' },

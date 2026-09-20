@@ -34,8 +34,9 @@ function appUrl(url: string): Plugin {
       order: 'post',
       handler(html, ctx) {
         // The app proper is loaded by a dynamic import (so demo mode can step in first), which hides
-        // it from the browser until the entry script has run. Announcing those files, and the two
-        // fonts every screen uses, lets them download alongside the entry script instead of after it.
+        // it from the browser until the entry script has run. Announcing those files, and the three
+        // fonts every screen uses (body, headline, and the wordmark's own face), lets them download
+        // alongside the entry script instead of after it — the logo is on screen from first paint.
         const files = Object.keys(ctx.bundle ?? {});
         const pick = (re: RegExp) => files.filter((f) => re.test(f));
         const tags = [
@@ -44,7 +45,7 @@ function appUrl(url: string): Plugin {
             attrs: { rel: 'modulepreload', href: `/${f}`, crossorigin: true },
             injectTo: 'head' as const,
           })),
-          ...pick(/assets\/(bricolage-grotesque-latin-wdth-normal|figtree-latin-wght-normal)-[\w-]+\.woff2$/).map((f) => ({
+          ...pick(/assets\/(bricolage-grotesque-latin-wdth-normal|figtree-latin-wght-normal|unbounded-latin-wght-normal)-[\w-]+\.woff2$/).map((f) => ({
             tag: 'link',
             attrs: { rel: 'preload', as: 'font', type: 'font/woff2', href: `/${f}`, crossorigin: true },
             injectTo: 'head' as const,

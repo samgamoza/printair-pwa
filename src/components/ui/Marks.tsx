@@ -59,12 +59,14 @@ export function Logo({
   return (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
       <LogoMark className={markClassName} tone={tone} />
+      {/* The wordmark's own face (Unbounded), fixed across both skins — see --font-wordmark in
+          tailwind.config.js. Its cut corners echo the plane's folded paper, which font-display
+          (Bricolage) doesn't. font-weight is set directly rather than with a font-bold utility so it
+          reads correctly at Unbounded's own weight, not Bricolage's. */}
       <span
         data-wordmark
-        className={`font-display text-[1.35rem] font-extrabold leading-none tracking-tight ${
-          tone === 'light' ? 'text-white' : 'text-ink-950'
-        }`}
-        style={{ fontVariationSettings: "'wdth' 88" }}
+        className={`font-wordmark text-[1.3rem] leading-none tracking-tight ${tone === 'light' ? 'text-white' : 'text-ink-950'}`}
+        style={{ fontWeight: 700 }}
       >
         Print<span style={{ color: tone === 'light' ? LOGO_ORANGE.onDark : LOGO_ORANGE.onLight }}>Air</span>
       </span>

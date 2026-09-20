@@ -24,12 +24,15 @@
   font-optical-sizing: auto;
 }
 
-/* The wordmark is part of the logo, not a headline: it keeps its own face in every skin. */
+/* The wordmark is part of the logo, not a headline: it keeps its own face in every skin (see
+   --font-wordmark in tailwind.config.js, which .classic deliberately never redefines). This rule
+   only has to undo Classic's own font-family reset below, which would otherwise win by specificity
+   and inheritance for anything with .classic as an ancestor. */
 .classic [data-wordmark] {
-  font-family: 'Bricolage Grotesque Variable', ui-sans-serif, system-ui, sans-serif;
-  font-weight: 800;
-  letter-spacing: -0.025em;
-  font-variation-settings: 'wdth' 88;
+  font-family: 'Unbounded Variable', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  font-variation-settings: normal;
 }
 
 /* Small uppercase section label, in ember like the website's "PROJECT BUILDER". */

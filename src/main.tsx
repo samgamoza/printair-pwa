@@ -7,6 +7,9 @@ import '@fontsource-variable/figtree';
 // time something on screen uses them.
 import '@fontsource-variable/fraunces/opsz.css';
 import '@fontsource-variable/plus-jakarta-sans';
+// The "PrintAir" wordmark's own typeface (Marks.tsx). Fixed across both skins on purpose — a
+// logotype is a piece of brand identity, not a themable surface, so it doesn't switch with Classic.
+import '@fontsource-variable/unbounded';
 import './index.css';
 import './styles/classic.css';
 import { initLook } from './lib/look';

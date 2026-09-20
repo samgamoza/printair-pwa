@@ -98,3 +98,10 @@ npm run build
 
 - **Header links** use the headline face (`font-display`, 15px, semibold, `ink-800`) with a magenta underline that draws in from the left on hover (`NAV_LINK` in `components/marketing/Chrome.tsx`). "Get the app" is an outlined magenta pill so it reads as an action, not a section.
 - **Hero picture** (`HeroArt` in `LandingPage.tsx`): three real photographs of print work (on press, checked, packed), stacked and drifting, each on an ink-coloured plate that peeks out behind it like a colour printed out of register; the quotation card and "In production" chip float on top. The owner asked for the website's floating-photo hero; this is that idea in the Process style. Photos are Pexels stock, decoration only, chosen without readable brand names; replace with partners' own photos when available. Desktop only: phones are served a 1-pixel image through `<picture>`, and data-saver connections get the plates without photos.
+
+## Wordmark typeface (2026-09-20)
+
+- The "PrintAir" wordmark (`Logo()` in `components/ui/Marks.tsx`, `data-wordmark`) is set in **Unbounded** (`@fontsource-variable/unbounded`, weight 700), not the headline face. The plane graphic itself is untouched — this only changes the type next to it.
+- It is fixed across both skins on purpose: a logotype is brand identity, not a themable surface, so it doesn't switch to Fraunces under Classic the way headlines do. Mechanically this is `--font-wordmark`, declared once on `:root` in `tailwind.config.js` and deliberately never redefined inside `.classic`; `classic.css`'s `.classic [data-wordmark]` rule only exists to undo Classic's own `font-family` reset, which would otherwise win by inheritance.
+- Unbounded has no width axis (unlike Bricolage's `wdth`), so the wordmark sets `font-weight: 700` directly with no `fontVariationSettings`.
+- The share card (`brand/share-card.html` → `public/share-card.png`) uses the same face for its "PrintAir" lockup; regenerate it the same way as before (serve the file locally, screenshot at 1200×630) after any further change here.

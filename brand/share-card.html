@@ -5,6 +5,8 @@
 <style>
   @font-face { font-family: Bricolage; src: url('../node_modules/@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-wdth-normal.woff2') format('woff2'); font-weight: 200 800; font-stretch: 75% 100%; }
   @font-face { font-family: Figtree; src: url('../node_modules/@fontsource-variable/figtree/files/figtree-latin-wght-normal.woff2') format('woff2'); font-weight: 300 900; }
+  /* The wordmark's own face (Marks.tsx), fixed across both skins — keep this in sync with it. */
+  @font-face { font-family: Unbounded; src: url('../node_modules/@fontsource-variable/unbounded/files/unbounded-latin-wght-normal.woff2') format('woff2'); font-weight: 200 900; }
   html, body { margin: 0; }
   body { width: 1200px; height: 630px; background: #f6f5fa; position: relative; overflow: hidden; font-family: Figtree, sans-serif; color: #0f0d1a; }
   .dots { position: absolute; right: -40px; top: -40px; width: 520px; height: 520px; background-image: radial-gradient(#7fdcf8 3.2px, transparent 3.6px); background-size: 26px 26px; opacity: .9; }
@@ -12,7 +14,7 @@
   .lockup { display: flex; align-items: center; gap: 20px; }
   .tile { width: 84px; height: 84px; border-radius: 24px; background: #fff; box-shadow: 0 8px 24px -10px rgba(15,13,26,.25), 0 0 0 1px rgba(15,13,26,.08); display: flex; align-items: center; justify-content: center; }
   .tile img { width: 78%; }
-  .word { font-family: Bricolage, sans-serif; font-weight: 800; font-size: 50px; letter-spacing: -0.03em; font-stretch: 88%; }
+  .word { font-family: Unbounded, sans-serif; font-weight: 700; font-size: 46px; letter-spacing: -0.01em; }
   .word span { color: #d9570a; }
   h1 { font-family: Bricolage, sans-serif; font-weight: 700; font-stretch: 92%; font-size: 92px; line-height: .98; letter-spacing: -0.03em; margin: auto 0 0; max-width: 900px; }
   h1 em { font-style: normal; position: relative; white-space: nowrap; }
