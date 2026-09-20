@@ -26,6 +26,16 @@ if not exist "node_modules\" (
   )
 )
 
+rem An earlier demo window may still be running and holding the address. Stop it so this one
+rem always starts fresh with the latest version.
+for /f "tokens=5" %%p in ('netstat -ano ^| findstr /r /c:":4180 .*LISTENING"') do (
+  echo  Closing the demo that was already running...
+  taskkill /F /PID %%p >nul 2>nul
+)
+
+rem New fonts or tools may have been added since the last run.
+if not exist "node_modules\@fontsource-variable\fraunces\" call npm install
+
 echo.
 echo  Starting PrintAir at http://localhost:4180  ^(your browser will open by itself^)
 echo  Use the yellow "Demo" button to switch between customer, partner, designer and admin.
