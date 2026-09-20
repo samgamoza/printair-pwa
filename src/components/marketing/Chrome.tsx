@@ -12,6 +12,14 @@ import { GetAppButton } from '@/pwa/InstallPrompt';
 /** The address the website publishes in its footer — the only contact point people are given. */
 const CONTACT_EMAIL = 'hello@printair.ph';
 
+/**
+ * Header links: the headline face at a calm weight, near-black, with an ink underline that draws in
+ * from the left on hover — the same gesture as the highlighter stroke under "printing." in the hero.
+ */
+const NAV_LINK =
+  "relative rounded-full px-3.5 py-2 font-display text-[0.9375rem] font-semibold tracking-[-0.01em] text-ink-800 transition-colors hover:text-ink-950 " +
+  "after:absolute after:inset-x-3.5 after:bottom-1 after:h-0.5 after:origin-left after:scale-x-0 after:rounded-full after:bg-magenta-500 after:transition-transform after:duration-300 hover:after:scale-x-100 motion-reduce:after:transition-none";
+
 /** Top bar for the two welcome pages. */
 export function MarketingHeader() {
   const { session, profile, openSignIn } = useAuth();
@@ -25,22 +33,22 @@ export function MarketingHeader() {
           <Link to="/" className="mr-auto">
             <Logo />
           </Link>
-          <nav className="mr-2 hidden items-center gap-1 md:flex" aria-label="Sections">
-            {/* In-page sections, as on the website. Plain anchors: "/#how" works from any page, and the
-                landing page scrolls to the hash itself after a client-side navigation. */}
-            <Link to="/#how" className="hidden rounded-full px-4 py-2 text-sm font-bold text-ink-600 hover:bg-ink-100 hover:text-ink-950 lg:block">
+          <nav className="mr-3 hidden items-center gap-0.5 md:flex" aria-label="Sections">
+            {/* In-page sections, as on the website. "/#how" works from any page, and the landing page
+                scrolls to the hash itself after a client-side navigation. */}
+            <Link to="/#how" className={`${NAV_LINK} hidden lg:block`}>
               How it works
             </Link>
-            <Link to="/#inspiration" className="hidden rounded-full px-4 py-2 text-sm font-bold text-ink-600 hover:bg-ink-100 hover:text-ink-950 lg:block">
+            <Link to="/#inspiration" className={`${NAV_LINK} hidden lg:block`}>
               Inspiration
             </Link>
-            <Link to="/partners" className="rounded-full px-4 py-2 text-sm font-bold text-ink-600 hover:bg-ink-100 hover:text-ink-950">
+            <Link to="/partners" className={NAV_LINK}>
               Printing partners
             </Link>
-            <Link to="/designers" className="rounded-full px-4 py-2 text-sm font-bold text-ink-600 hover:bg-ink-100 hover:text-ink-950">
+            <Link to="/designers" className={NAV_LINK}>
               Designers
             </Link>
-            <GetAppButton className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold text-magenta-700 hover:bg-magenta-50" />
+            <GetAppButton className="ml-2 inline-flex min-h-9 items-center gap-1.5 rounded-full px-3.5 font-display text-[0.9375rem] font-semibold tracking-[-0.01em] text-magenta-700 ring-1 ring-inset ring-magenta-300 transition-colors hover:bg-magenta-50 hover:ring-magenta-400" />
           </nav>
           {session && profile ? (
             <>

@@ -93,3 +93,8 @@ npm run build
 - **Voice** — `useSay()` returns `(english, taglish) => string`. Write the English first; add Taglish only where a smile costs nothing.
 - **Dark mode** — every palette, including `white`, is a CSS variable, and `.dark` on `<html>` swaps in the `DARK` set from `tailwind.config.js`. Scales are flipped, so `bg-white` becomes the dark surface and `text-ink-950` becomes near-white: existing screens work without `dark:` classes. Use a literal (`bg-[#fff]`, `text-[#fff]`) only when a colour must not flip. Labelled Beta until it has had a real-device pass.
 - **Effects** — `src/delight/effects.ts`. Confetti uses the Web Animations API (no library), sounds are synthesised (no audio files), both are skipped for reduced motion or when the device switch is off.
+
+## Welcome-page header and hero picture (2026-09-20)
+
+- **Header links** use the headline face (`font-display`, 15px, semibold, `ink-800`) with a magenta underline that draws in from the left on hover (`NAV_LINK` in `components/marketing/Chrome.tsx`). "Get the app" is an outlined magenta pill so it reads as an action, not a section.
+- **Hero picture** (`HeroArt` in `LandingPage.tsx`): three real photographs of print work (on press, checked, packed), stacked and drifting, each on an ink-coloured plate that peeks out behind it like a colour printed out of register; the quotation card and "In production" chip float on top. The owner asked for the website's floating-photo hero; this is that idea in the Process style. Photos are Pexels stock, decoration only, chosen without readable brand names; replace with partners' own photos when available. Desktop only: phones are served a 1-pixel image through `<picture>`, and data-saver connections get the plates without photos.

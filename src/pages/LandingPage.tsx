@@ -161,7 +161,7 @@ export default function LandingPage() {
 
             {/* Phones go straight from the pitch to the two doors; the illustration would only push them down. */}
             <div className="hidden lg:block">
-              <HeroArt />
+              <HeroArt lean={lean} />
             </div>
           </div>
         </section>
@@ -471,49 +471,82 @@ export default function LandingPage() {
  * multiply into a third colour, exactly as on press — with a sample of what
  * the app actually shows you on top.
  */
-function HeroArt() {
-  return (
-    <div className="relative mx-auto aspect-square w-full max-w-md" aria-hidden="true">
-      <CropMarks className="text-ink-300" />
-      <span className="overprint absolute left-[4%] top-[8%] h-[58%] w-[58%] animate-float rounded-[22%] bg-cyan-300" style={{ '--tilt': '-8deg' } as React.CSSProperties} />
-      <span
-        className="overprint absolute right-[4%] top-[14%] h-[58%] w-[58%] animate-float rounded-[22%] bg-magenta-300 [animation-delay:-2s]"
-        style={{ '--tilt': '7deg' } as React.CSSProperties}
-      />
-      <span
-        className="overprint absolute bottom-[4%] left-[20%] h-[58%] w-[58%] animate-float rounded-[22%] bg-sun-300 [animation-delay:-4s]"
-        style={{ '--tilt': '3deg' } as React.CSSProperties}
-      />
-      <RegistrationMark className="absolute right-2 top-2 h-7 w-7 text-ink-400" />
+/**
+ * Three real photographs of print work, stacked and drifting like proofs on a table — the website's
+ * hero idea, in this design's hand: each sits on an ink-coloured plate that peeks out behind it, the
+ * way a sheet looks when one colour prints slightly out of register. The quotation card and the
+ * status chip float on top, so the picture tells the whole story: on press, checked, packed, tracked.
+ *
+ * Stock photos (Pexels), decoration only: nothing here claims to be a customer's job. Swap in real
+ * partner photos when there are some. Phones never see this block, so they are handed a 1-pixel
+ * image instead of the photo; on a data-saver connection only the ink plates are drawn.
+ */
+const HERO_PHOTOS = [
+  { id: '9550363', alt: 'Printed sheets running through an offset press', box: 'right-0 top-[3%] h-[62%] w-[64%]', plate: 'bg-magenta-300', tilt: '3deg', delay: '', w: 640, h: 620 },
+  { id: '6620970', alt: 'Hands checking freshly printed sheets beside a press', box: 'left-0 top-0 h-[40%] w-[42%]', plate: 'bg-cyan-300', tilt: '-6deg', delay: '[animation-delay:-2s]', w: 420, h: 400 },
+  { id: '31651848', alt: 'Finished printed boxes, packed', box: 'bottom-[3%] left-[3%] h-[36%] w-[46%]', plate: 'bg-sun-300', tilt: '-2deg', delay: '[animation-delay:-4s]', w: 460, h: 360 },
+] as const;
+const BLANK = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
 
-      <div className="absolute inset-x-[9%] top-[24%] rounded-3xl bg-white p-4 shadow-lift ring-1 ring-ink-900/5">
+function HeroArt({ lean }: { lean: boolean }) {
+  return (
+    <div className="relative mx-auto aspect-square w-full max-w-lg">
+      <CropMarks className="text-ink-300" />
+      <RegistrationMark className="absolute right-1 top-0 h-7 w-7 text-ink-400" />
+
+      {HERO_PHOTOS.map((p) => {
+        const url = `https://images.pexels.com/photos/${p.id}/pexels-photo-${p.id}.jpeg`;
+        return (
+          <div key={p.id} className={`absolute animate-float ${p.box} ${p.delay}`} style={{ '--tilt': p.tilt } as React.CSSProperties}>
+            <span className={`absolute inset-0 translate-x-2.5 translate-y-2.5 rounded-[1.75rem] ${p.plate}`} aria-hidden="true" />
+            {lean ? (
+              <span className={`absolute inset-0 rounded-[1.75rem] ${p.plate} opacity-60`} aria-hidden="true" />
+            ) : (
+              <picture>
+                <source media="(max-width: 1023px)" srcSet={BLANK} />
+                <img
+                  src={sized(url, p.w, p.h)}
+                  srcSet={`${sized(url, p.w, p.h)} 1x, ${sized(url, p.w * 2, p.h * 2)} 2x`}
+                  alt={p.alt}
+                  decoding="async"
+                  className="absolute inset-0 h-full w-full rounded-[1.75rem] border-4 border-[#fff] bg-ink-100 object-cover shadow-lift"
+                />
+              </picture>
+            )}
+          </div>
+        );
+      })}
+
+      <div className="absolute bottom-[2%] right-[-1%] w-[58%] rounded-3xl bg-white p-3.5 shadow-lift ring-1 ring-ink-900/5" aria-hidden="true">
         <div className="flex items-center justify-between gap-2">
           <p className="slug text-ink-500">Coffee shop</p>
           <span className="rounded-full bg-sun-200 px-2.5 py-1 text-xs font-extrabold text-sun-900">3 quotations</span>
         </div>
-        <p className="mt-1.5 font-display text-xl font-bold text-ink-950">Kraft cup sleeves</p>
-        <p className="text-sm text-ink-500">1,000 pcs · Pasig City</p>
-        <div className="mt-3 space-y-2">
+        <p className="mt-1 font-display text-lg font-bold leading-tight text-ink-950">Kraft cup sleeves</p>
+        <p className="text-xs text-ink-500">1,000 pcs · Pasig City</p>
+        <div className="mt-2.5 space-y-1.5">
           {[
             { name: 'Manila Offset Press', price: '₱18,500', days: '12 days', ink: 'bg-cyan-300' },
             { name: 'Davao Digital Print', price: '₱19,200', days: '7 days', ink: 'bg-magenta-300' },
           ].map((q) => (
-            <div key={q.name} className="flex items-center gap-3 rounded-2xl bg-ink-50 p-2.5">
-              <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl font-display text-sm font-extrabold text-ink-950 ${q.ink}`}>
-                {q.name[0]}
-              </span>
+            <div key={q.name} className="flex items-center gap-2.5 rounded-2xl bg-ink-50 p-2">
+              <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl font-display text-sm font-extrabold text-ink-950 ${q.ink}`}>{q.name[0]}</span>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-bold text-ink-900">{q.name}</p>
+                <p className="truncate text-[0.8125rem] font-bold text-ink-900">{q.name}</p>
                 <p className="text-xs text-ink-500">{q.days}</p>
               </div>
-              <p className="font-display text-lg font-extrabold text-ink-950">{q.price}</p>
+              <p className="font-display text-base font-extrabold text-ink-950">{q.price}</p>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="absolute bottom-[6%] right-[2%] flex items-center gap-2.5 rounded-full bg-ink-950 py-2.5 pl-3 pr-5 text-white shadow-lift">
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-leaf-400 text-ink-950">
+      <div
+        className="absolute right-[-2%] top-[9%] flex animate-float items-center gap-2.5 rounded-full bg-ink-950 py-2 pl-2.5 pr-4 text-white shadow-lift [animation-delay:-1s]"
+        style={{ '--tilt': '0deg' } as React.CSSProperties}
+        aria-hidden="true"
+      >
+        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-leaf-400 text-ink-950">
           <Check className="h-4 w-4" strokeWidth={3.5} />
         </span>
         <span className="text-sm font-bold">In production</span>
