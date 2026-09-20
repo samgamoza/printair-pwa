@@ -134,7 +134,7 @@ export default function DesignerOpportunityDetailPage() {
       />
 
       {/* On a phone the question sits between the brief and the proposal; from `lg` it moves to the side column. */}
-      <div className="grid gap-5 lg:grid-cols-[1.35fr_1fr]">
+      <div className="grid gap-5 lg:grid-cols-[1.35fr_1fr] [&>*]:min-w-0">
         <Card className="lg:col-start-1">
           <CardTitle>The brief</CardTitle>
           <div className="mt-4">

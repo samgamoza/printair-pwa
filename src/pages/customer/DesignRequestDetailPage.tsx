@@ -266,7 +266,7 @@ export default function DesignRequestDetailPage() {
         </div>
       )}
 
-      <div className="grid gap-5 lg:grid-cols-[1.35fr_1fr]">
+      <div className="grid gap-5 lg:grid-cols-[1.35fr_1fr] [&>*]:min-w-0">
         <div className="space-y-5">
           {/* What needs doing comes first; the brief it refers to sits underneath. */}
           {order && order.status === 'AWAITING_PAYMENT' && payment && (
@@ -623,6 +623,15 @@ function BookingFeeCard({ payment, onPay, busy }: { payment: DesignPaymentRow; o
       <Button variant="accent" size="lg" fullWidth className="relative mt-5" onClick={onPay} loading={busy}>
         Pay now
       </Button>
+      <p className="relative mt-3 flex flex-wrap items-center justify-center gap-1.5 text-sm text-white/70">
+        Pay with
+        {['GCash', 'Maya', 'Card'].map((m) => (
+          <span key={m} className="rounded-full bg-white/10 px-2.5 py-0.5 font-bold text-white">
+            {m}
+          </span>
+        ))}
+        <span className="basis-full text-center text-xs">Secured by PayMongo</span>
+      </p>
     </Card>
   );
 }

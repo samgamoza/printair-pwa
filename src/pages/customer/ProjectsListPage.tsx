@@ -12,6 +12,8 @@ import { getProjectQuotes } from '@/lib/api/quotes';
 import { CATEGORIES } from '@/data/catalog';
 import { formatDate } from '@/lib/format';
 import { useCreate } from './createContext';
+import { SukiCard } from '@/delight/SukiCard';
+import { SeasonKits } from '@/delight/SeasonKits';
 
 const FILTERS: { key: string; label: string; statuses: string[] }[] = [
   { key: 'all', label: 'All', statuses: [] },
@@ -105,6 +107,14 @@ export default function ProjectsListPage() {
         }
       />
 
+      {/* Standing and what's in season: only once the list has loaded, so the page doesn't jump. */}
+      {!loading && !error && projects.length > 0 && (
+        <div className="mb-6 space-y-5">
+          <SukiCard delivered={projects.filter((p) => p.status === 'DELIVERED').length} />
+          <SeasonKits compact onPick={(categoryId) => startProject(categoryId)} />
+        </div>
+      )}
+
       <FilterTabs
         value={filter.key}
         onChange={(key) => setSearchParams(key === 'all' ? {} : { filter: key })}
@@ -122,7 +132,7 @@ export default function ProjectsListPage() {
           <ErrorState title="Couldn't load your projects" message={error} onRetry={load} />
         ) : filtered.length === 0 ? (
           projects.length === 0 ? (
-            <EmptyState
+            <EmptyState pip
               icon={ClipboardList}
               title="No projects yet"
               body="Start a guided project and we'll match you with printing partners who can make it."

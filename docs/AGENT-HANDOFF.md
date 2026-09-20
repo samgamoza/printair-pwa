@@ -91,6 +91,7 @@ src/components/dashboard/  forms, timelines, StatusBadge set shared by role page
 src/components/            ProjectBuilder, DesignRequestBuilder, Assistant (calls edge function `chat-assistant`), ErrorBoundary; Button.tsx and Modal.tsx are thin re-exports kept so carried-over imports resolve
 src/pages/                 LandingPage, DesignLandingPage, LegalPage, directories + public profiles, ResetPasswordPage, checkout/, and one folder per role (customer, partner, designer, admin)
 src/pwa/                   install.ts (captures beforeinstallprompt at module load; `how`: prompt | ios | android | desktop), InstallPrompt.tsx (InstallSheet, GetAppButton, InstallBanner), UpdateToast, OfflinePage, AppEntry (/app → role home), useOnline
+src/delight/               the friendly layer (2026-09-20): prefs.ts (Taglish voice, sounds, dark mode; device-only), effects.ts (confetti, chime, buzz, once()), Mascot.tsx (Pip), seasons.ts + SeasonKits, suki.ts + SukiCard, budget.ts, checks.ts, MockupPreview, ShareCard, share.ts, OrderHero, TopPartners, delight.test.ts. Rules in §6a
 src/demo/                  install.ts (patches window.fetch to emulate PostgREST, RPCs, auth, storage, edge functions), fixtures.ts, DemoSwitcher.tsx. Loaded ONLY when VITE_DEMO=1; verified absent from production builds
 ```
 
@@ -121,6 +122,17 @@ Reference implementations to copy from: `pages/customer/ProjectsListPage.tsx` (l
 ### Skins (added 2026-09-20)
 
 The owner asked to try the original website's look (its fonts and warm, Airbnb-like calm) on customer sign-up, partner onboarding and the print-project builder, keeping this app's UX. That is now a skin, not a fork: see "Skins: Process and Classic" in `docs/DESIGN-SYSTEM.md`. Default is `mixed` (Classic on those flows, Process elsewhere); the demo's yellow button has a Look switch — Mixed / New only / Classic everywhere — so the owner can compare. "Classic everywhere" suits the orange logo well and may be where this ends up; don't decide for them.
+
+## 6a. The friendly layer (`src/delight/`, added 2026-09-20)
+
+The owner asked for an app Filipino small-business owners would find endearing and want to share. All of it is front end only; the bigger, backend-dependent versions are listed in `docs/BACKEND-FOLLOWUPS.md` §5. House rules:
+
+- **Pip** (the paper-plane mascot) is a character of its own, not the logo. Pip appears while loading, on friendly empty states (`<EmptyState pip>` is opt-in), on the order progress card, offline, and at celebrations. Never on admin screens, "not found" or locked states, prices or payments.
+- **Taglish** is a device preference, off by default, used through `useSay()(english, taglish)`. It is for the playful edges only. Money, errors, statuses, legal and anything a person must not misread stay in plain English in both voices.
+- **Celebrations** (`celebrate()`, `chime()`) fire once per event per device through `once(key, …)`, respect reduced motion, and are silenced by the "Sounds and vibration" switch.
+- **Honest numbers only.** Suki status counts delivered projects and promises no perks. Top-rated partners renders nothing until partners have real reviews. Season kits render nothing outside their ordering windows. The budget is a labelled line in the project notes because there is no budget column. The product mockup is captioned "not a print proof" and never uploads the file.
+- **Reorder** ("Print this again") passes the old project to `ProjectBuilder` as `template`; it creates a fresh draft and partners quote it fresh. It never copies a price.
+- **Dark mode (Beta)** flips the palette variables under `.dark` (see `DARK` in `tailwind.config.js`). Because `white` is now a variable too, use the literal `bg-[#fff]` for anything that must stay white in the dark (the logo tile, toggle knobs). Classic + dark uses the dark palette with Classic's fonts.
 
 ## 7. Brand
 
@@ -172,7 +184,9 @@ Done: full redesign of every screen for all four roles with parity audited again
 
 Backend mirrored into this repo on 2026-09-20 (34 files from `printair_claude` @ `acd1751`, copied from git so no secrets or local state came along). Lint, typecheck, unit tests and build pass with it in place; the backend suites were **not** run here (no Docker in the build sandbox) — CI has a `backend` job that will run them on the first push.
 
-**Not deployed yet.** No GitHub remote yet.
+Friendly layer added 2026-09-20 (§6a): Pip, Taglish voice, Suki status, reorder, season kits, budget field, product mockup, pay-with chips, share card, "ask someone's opinion", invite, top-rated partners, delivery-style order progress, sounds and confetti, dark mode (Beta). The same pass fixed a sideways-scroll bug on the three detail pages on phones (grid children needed `min-w-0`).
+
+**Not deployed yet.** `origin` is `https://github.com/samgamoza/printair-pwa.git`; the owner pushes with `Push to GitHub.bat` (agents have no credentials and must not ask for them).
 
 ### Open — needs the owner
 

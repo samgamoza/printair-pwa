@@ -114,7 +114,7 @@ export default function ActiveProjectsPage() {
       )}
 
       {orders.length === 0 ? (
-        <EmptyState icon={Package} tone="grape" title="No active projects right now." />
+        <EmptyState pip icon={Package} tone="grape" title="No active projects right now." />
       ) : (
         <div className="grid gap-5 lg:grid-cols-2">
           {orders.map((o) => {

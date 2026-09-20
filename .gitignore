@@ -28,3 +28,6 @@ supabase/.branches
 
 # Local copy of the notification dispatch secret (also a Supabase secret).
 .notify-secret.tmp
+
+# TypeScript incremental build state
+*.tsbuildinfo

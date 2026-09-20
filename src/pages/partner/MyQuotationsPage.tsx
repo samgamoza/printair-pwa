@@ -45,7 +45,7 @@ export default function MyQuotationsPage() {
       {header}
 
       {quotes.length === 0 ? (
-        <EmptyState icon={FileText} tone="cyan" title="No quotations yet." body="Submit one from a new opportunity." />
+        <EmptyState pip icon={FileText} tone="cyan" title="No quotations yet." body="Submit one from a new opportunity." />
       ) : (
         <div className="space-y-3">
           {quotes.map((q) => {

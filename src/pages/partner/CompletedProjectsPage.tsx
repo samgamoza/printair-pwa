@@ -58,7 +58,7 @@ export default function CompletedProjectsPage() {
       {header}
 
       {orders.length === 0 ? (
-        <EmptyState icon={PackageCheck} tone="cyan" title="Nothing delivered yet." />
+        <EmptyState pip icon={PackageCheck} tone="cyan" title="Nothing delivered yet." />
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           {orders.map((o) => {

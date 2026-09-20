@@ -9,6 +9,8 @@ import { ColorBar, CropMarks, RegistrationMark } from '@/components/ui/Marks';
 import { InstallBanner } from '@/pwa/InstallPrompt';
 import { useAuth } from '@/contexts/AuthContext';
 import { isConstrained, whenIdleAndUnconstrained } from '@/pwa/connection';
+import { SeasonKits } from '@/delight/SeasonKits';
+import { TopPartners } from '@/delight/TopPartners';
 import { CATEGORIES, INSPIRATION_ITEMS } from '@/data/catalog';
 
 // The builder and the assistant are the two heaviest things on this page and neither is needed to
@@ -250,6 +252,11 @@ export default function LandingPage() {
           <InstallBanner />
         </div>
 
+        {/* ---------- In season ---------- */}
+        <div className="mx-auto max-w-6xl px-5 pt-12 sm:px-8 lg:pt-16 [&:empty]:hidden">
+          <SeasonKits onPick={(categoryId) => openBuilder(categoryId)} />
+        </div>
+
         {/* ---------- Categories ---------- */}
         <section id="builder" className="mx-auto max-w-6xl scroll-mt-20 px-5 py-14 sm:px-8 lg:py-20">
           <p className="slug text-magenta-600">Project builder</p>
@@ -372,6 +379,8 @@ export default function LandingPage() {
             ))}
           </Rail>
         </section>
+
+        <TopPartners />
 
         {/* ---------- Two doors ---------- */}
         <section id="partners" className="mx-auto max-w-6xl scroll-mt-20 px-5 pb-14 sm:px-8 lg:pb-20">

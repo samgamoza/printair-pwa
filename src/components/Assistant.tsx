@@ -253,7 +253,7 @@ export function Assistant({ onOpenBuilder, onOpenProvider }: AssistantProps) {
           {/* Header */}
           <div className="relative flex items-center gap-3 overflow-hidden bg-ink-950 p-4 text-white">
             <span className="pointer-events-none absolute -right-6 -top-8 h-28 w-40 bg-halftone bg-dots text-white/15" aria-hidden="true" />
-            <span className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-white">
+            <span className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-[#fff]">
               <PlaneGlyph className="h-7 w-7" />
               <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-leaf-400 ring-[3px] ring-ink-950" />
             </span>

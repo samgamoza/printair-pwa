@@ -126,7 +126,7 @@ export default function DesignRequestsListPage() {
           <ErrorState title="Couldn't load your design requests" message={error} onRetry={load} />
         ) : filtered.length === 0 ? (
           requests.length === 0 ? (
-            <EmptyState
+            <EmptyState pip
               icon={Palette}
               tone="magenta"
               title="No design requests yet"

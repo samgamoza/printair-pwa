@@ -95,6 +95,26 @@ Edge function CORS is already `*`, so the assistant and checkout calls work from
 - **Light on data.** Only the Latin font cuts and the code are precached (not icons, other alphabets or the share picture). Each role's screens load on demand and are warmed while the browser is idle. Idea photos are requested at the size drawn. On a data-saver or 2G connection the app skips warming and decorative photos altogether (`src/pwa/connection.ts`).
 - **Updates ask first.** A new version downloads in the background and shows "A new version of PrintAir is ready — Refresh", rather than reloading under someone halfway through a quote. An open app checks for updates hourly.
 
+## What makes it friendly
+
+Added for the people it is for: owners of small Filipino businesses, on their phones. It all lives in `src/delight/`, needs no backend change, and the rules for it are in `docs/AGENT-HANDOFF.md` §6a. The bigger versions that do need the backend are in `docs/BACKEND-FOLLOWUPS.md` §5.
+
+- **Pip**, a little paper plane, keeps you company while things load, on empty screens, on the order progress card, offline and at celebrations. Never near prices or payments.
+- **Taglish voice** (off by default; account menu → This device). Playful edges only: money, errors and statuses stay in plain English.
+- **Suki status.** Ka-negosyo → Suki (3 delivered orders) → Super Suki (10). Recognition only; it promises no perks.
+- **Print this again.** A delivered project reopens in the builder with everything filled in. Partners quote it fresh.
+- **In season now.** 11.11, 12.12, Christmas, Valentine's, graduation and New Year kits, each with the days left to order in time. Shown only while the window is open.
+- **Your budget.** An optional figure that travels to partners as a labelled line in the notes.
+- **Preview on a product.** An uploaded logo or image drawn on a cup, box or bag, on the device. Captioned as not a print proof.
+- **Pay with GCash · Maya · Card**, shown on the fee card before the button is pressed.
+- **Show it off.** A Stories-sized picture of a delivered job, with the customer's own photo and caption, for the phone's share sheet.
+- **Ask someone's opinion.** Sends a plain summary of the quotes to any chat app.
+- **Invite a ka-negosyo**, from the account menu.
+- **Top-rated printing partners** on the welcome page, from real reviews only.
+- **Order progress the way a delivery app tells it:** one friendly sentence and a bar that fills. The dated timeline stays as the record.
+- **Sounds, a small vibration and confetti** for the good moments (a new quote, payment received, delivered). Once per event, off with one switch, skipped for reduced motion.
+- **Dark mode (Beta).**
+
 The logo is the supplied artwork in `brand/printair-mark-source.png`. `npm run icons` cuts it out onto a transparent background (`public/logo-mark.png`, used inside the app) and makes every icon size from it. Replace that one file and re-run to change the logo everywhere.
 
 ## Where things are

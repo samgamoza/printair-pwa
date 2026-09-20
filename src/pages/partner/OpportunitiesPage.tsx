@@ -48,7 +48,7 @@ export default function OpportunitiesPage() {
       {loading ? (
         <SkeletonList rows={4} />
       ) : opportunities.length === 0 ? (
-        <EmptyState icon={Inbox} tone="magenta" title="No opportunities yet." body="New matching projects will appear here." />
+        <EmptyState pip icon={Inbox} tone="magenta" title="No opportunities yet." body="New matching projects will appear here." />
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           {opportunities.map((o) => {

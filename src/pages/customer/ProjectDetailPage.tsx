@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Ban, Clock, MapPin, Pencil, Send, Truck, Wallet, Zap, BadgePercent } from 'lucide-react';
+import { Ban, Clock, MapPin, MessagesSquare, Pencil, Repeat2, Send, Share2, Truck, Wallet, Zap, BadgePercent } from 'lucide-react';
 import { ProjectStatusBadge, QuoteStatusBadge } from '@/components/dashboard/StatusBadge';
 import { OrderTimeline } from '@/components/dashboard/OrderTimeline';
 import { ReviewForm } from '@/components/dashboard/ReviewForm';
@@ -32,6 +32,12 @@ import { formatDate, peso } from '@/lib/format';
 import { validateProjectForSubmit, projectIsEditable, type OrderStatus, type ProjectStatus } from '@/lib/validation';
 import { CATEGORIES } from '@/data/catalog';
 import { SearchX } from 'lucide-react';
+import { useCreate } from './createContext';
+import { OrderHero } from '@/delight/OrderHero';
+import { isTrackable } from '@/delight/checks';
+import { ShareCardSheet } from '@/delight/ShareCard';
+import { celebrate, chime, once } from '@/delight/effects';
+import { shareText } from '@/delight/share';
 
 function categoryName(id: string) {
   return CATEGORIES.find((c) => c.id === id)?.name ?? id;
@@ -52,7 +58,19 @@ export default function ProjectDetailPage() {
   const [actionError, setActionError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [payBusy, setPayBusy] = useState(false);
-  const { confirm } = useDialogs();
+  const [shareOpen, setShareOpen] = useState(false);
+  const { reorder } = useCreate();
+
+  // Small rewards, once each per device: a cheer the first time a delivered order is opened, a soft
+  // ping the first time a new count of quotations is seen.
+  const openQuotes = quotes.filter((q) => q.status === 'SUBMITTED').length;
+  useEffect(() => {
+    if (order?.status === 'DELIVERED') once(`delivered.${order.id}`, celebrate);
+  }, [order?.status, order?.id]);
+  useEffect(() => {
+    if (project && project.status === 'OPEN_FOR_QUOTES' && openQuotes > 0) once(`quotes.${project.id}.${openQuotes}`, () => chime('ping'));
+  }, [project, openQuotes]);
+  const { confirm, toast } = useDialogs();
 
   const load = useCallback(async () => {
     if (!id) return;
@@ -206,8 +224,27 @@ export default function ProjectDetailPage() {
         </div>
       )}
 
-      <div className="grid gap-5 lg:grid-cols-[1.35fr_1fr]">
+      <div className="grid gap-5 lg:grid-cols-[1.35fr_1fr] [&>*]:min-w-0">
         <div className="space-y-5">
+          {order && isTrackable(order.status) && (
+            <OrderHero
+              status={order.status}
+              what={project.title.toLowerCase()}
+              partner={quotes.find((q) => q.status === 'SELECTED')?.partner?.business_name ?? 'Your printing partner'}
+            />
+          )}
+
+          {order?.status === 'DELIVERED' && (
+            <div className="flex flex-col gap-2.5 sm:flex-row">
+              <Button variant="accent" size="lg" icon={<Repeat2 className="h-5 w-5" />} onClick={() => reorder(project)}>
+                Print this again
+              </Button>
+              <Button variant="secondary" size="lg" icon={<Share2 className="h-5 w-5" />} onClick={() => setShareOpen(true)}>
+                Show it off
+              </Button>
+            </div>
+          )}
+
           {/* What needs doing comes first; the brief it refers to sits underneath. */}
           {order && order.status === 'AWAITING_PAYMENT' && bookingPayment && (
             <BookingFeeCard payment={bookingPayment} onPay={handlePayNow} busy={payBusy} />
@@ -229,7 +266,24 @@ export default function ProjectDetailPage() {
             }}
           />
 
-          {project.status === 'OPEN_FOR_QUOTES' && <QuoteComparison quotes={submittedQuotes} onChoose={handleChoose} busy={busy} />}
+          {project.status === 'OPEN_FOR_QUOTES' && (
+            <QuoteComparison
+              quotes={submittedQuotes}
+              onChoose={handleChoose}
+              busy={busy}
+              onAsk={async () => {
+                const lines = submittedQuotes.map(
+                  (q) => `• ${q.partner?.business_name ?? 'A printing partner'}: ${peso(Number(q.total_price))}, ${q.turnaround_days} days`,
+                );
+                const how = await shareText({
+                  title: `Quotations for ${project.title}`,
+                  text: `Help me choose a printer for "${project.title}" on PrintAir:\n${lines.join('\n')}\nWhich one would you pick?`,
+                });
+                if (how === 'copied') toast('Copied. Paste it into Messenger or Viber.', 'success');
+                if (how === 'failed') toast("Couldn't share from this browser.", 'error');
+              }}
+            />
+          )}
 
           <ProjectSummaryCard
             project={project}
@@ -305,6 +359,7 @@ export default function ProjectDetailPage() {
           )}
         </div>
       </div>
+      <ShareCardSheet open={shareOpen} onClose={() => setShareOpen(false)} title={project.title} category={categoryName(project.category)} />
     </>
   );
 }
@@ -449,10 +504,13 @@ function QuoteComparison({
   quotes,
   onChoose,
   busy,
+  onAsk,
 }: {
   quotes: QuoteWithPartner[];
   onChoose: (id: string) => void;
   busy: boolean;
+  /** Send the quotations to a business partner or spouse for a second opinion. */
+  onAsk: () => void;
 }) {
   if (quotes.length === 0) {
     return (
@@ -471,9 +529,14 @@ function QuoteComparison({
 
   return (
     <section>
-      <h2 className="mb-3 text-2xl text-ink-950">
-        {quotes.length} quotation{quotes.length === 1 ? '' : 's'} received
-      </h2>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-2xl text-ink-950">
+          {quotes.length} quotation{quotes.length === 1 ? '' : 's'} received
+        </h2>
+        <Button variant="ghost" size="sm" icon={<MessagesSquare className="h-4 w-4" />} onClick={onAsk}>
+          Ask someone&apos;s opinion
+        </Button>
+      </div>
       <div className="space-y-3">
         {quotes.map((q) => (
           <Card key={q.id} className="transition-shadow hover:shadow-card">
@@ -558,6 +621,15 @@ function BookingFeeCard({
       <Button variant="accent" size="lg" fullWidth className="relative mt-5" onClick={onPay} loading={busy}>
         Pay now
       </Button>
+      <p className="relative mt-3 flex flex-wrap items-center justify-center gap-1.5 text-sm text-white/70">
+        Pay with
+        {['GCash', 'Maya', 'Card'].map((m) => (
+          <span key={m} className="rounded-full bg-white/10 px-2.5 py-0.5 font-bold text-white">
+            {m}
+          </span>
+        ))}
+        <span className="basis-full text-center text-xs">Secured by PayMongo</span>
+      </p>
     </Card>
   );
 }

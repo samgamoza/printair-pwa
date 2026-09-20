@@ -117,7 +117,7 @@ export default function PartnerDirectoryPage() {
         ) : error ? (
           <ErrorState title="Couldn't load partners" message={error} onRetry={load} />
         ) : partners.length === 0 ? (
-          <EmptyState icon={Printer} tone="cyan" title="No partners have joined yet." />
+          <EmptyState pip icon={Printer} tone="cyan" title="No partners have joined yet." />
         ) : shown.length === 0 ? (
           <EmptyState
             icon={SearchX}

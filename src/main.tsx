@@ -10,8 +10,10 @@ import '@fontsource-variable/plus-jakarta-sans';
 import './index.css';
 import './styles/classic.css';
 import { initLook } from './lib/look';
+import { applyTheme } from './delight/prefs';
 
 initLook();
+applyTheme();
 
 /**
  * The app is imported dynamically so that, in demo mode, the pretend backend is in place before

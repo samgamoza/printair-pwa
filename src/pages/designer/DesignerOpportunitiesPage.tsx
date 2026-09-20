@@ -55,7 +55,7 @@ export default function DesignerOpportunitiesPage() {
           body="Your job board opens once your application is approved. No work is being routed to your account yet."
         />
       ) : opportunities.length === 0 ? (
-        <EmptyState
+        <EmptyState pip
           icon={Inbox}
           tone="magenta"
           title="No design requests yet"

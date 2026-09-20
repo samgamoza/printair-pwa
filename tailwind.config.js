@@ -26,10 +26,15 @@ import plugin from 'tailwindcss/plugin.js';
   the handful of non-colour details (button gradient, headline weight, ornaments).
 */
 const PROCESS = {
+  white: { DEFAULT: '#ffffff' },
   ink: { 50: '#f6f5fa', 100: '#eeecf5', 200: '#dfdcea', 300: '#c5c1d6', 400: '#9893b0', 500: '#716b8c', 600: '#565070', 700: '#403b57', 800: '#2a263d', 900: '#19162a', 950: '#0f0d1a' },
   paper: { DEFAULT: '#ffffff', 50: '#ffffff', 100: '#fbfaff', 200: '#f6f5fa', 300: '#eeecf5' },
   magenta: { 50: '#fff0f7', 100: '#ffe0ef', 200: '#ffc2e0', 300: '#ff94c8', 400: '#fb5aa9', 500: '#ee2a8b', 600: '#d6106f', 700: '#b20a5a', 800: '#8f0c4b', 900: '#5e0a33' },
   cyan: { 50: '#ebfaff', 100: '#d0f3ff', 200: '#a3e6ff', 300: '#63d4fb', 400: '#22bdf0', 500: '#08a3dc', 600: '#0683b6', 700: '#0a6890', 800: '#0f5573', 900: '#0e3a50' },
+  sun: { 50: '#fffbe6', 100: '#fff5bf', 200: '#ffeb85', 300: '#ffdf47', 400: '#ffd21f', 500: '#f2b900', 600: '#c98f00', 700: '#9a6a04', 800: '#73500a', 900: '#4d360a' },
+  grape: { 50: '#f3f1ff', 100: '#e8e4ff', 200: '#d3cbff', 300: '#b3a5ff', 400: '#9078fb', 500: '#7352f2', 600: '#5d38dc', 700: '#4c2bb8', 800: '#3d2591', 900: '#2a1b63' },
+  leaf: { 50: '#ebfbf1', 100: '#d1f6df', 200: '#a5ecc1', 300: '#6bdb9b', 400: '#33c274', 500: '#16a35a', 600: '#0d8348', 700: '#0d683c', 800: '#0f5232', 900: '#0b3822' },
+  danger: { 50: '#fff1f1', 100: '#ffdfdf', 200: '#ffc4c4', 500: '#ef3b45', 600: '#d81f2e', 700: '#b01524' },
 };
 
 /** The original website's tokens, mapped onto this app's palette names. magenta → ember, cyan → teal. */
@@ -38,6 +43,30 @@ const CLASSIC = {
   paper: { DEFAULT: '#fefdfb', 50: '#fefdfb', 100: '#fdfbf7', 200: '#fbf8f3', 300: '#f5f0e8' },
   magenta: { 50: '#fff8ed', 100: '#ffedd0', 200: '#fed7a0', 300: '#fdba6b', 400: '#fc9a3c', 500: '#f57c14', 600: '#de620a', 700: '#b8490b', 800: '#93390f', 900: '#78300f' },
   cyan: { 50: '#f0fdfa', 100: '#ccfbf1', 200: '#99f6e4', 300: '#5eead4', 400: '#2dd4bf', 500: '#14b8a6', 600: '#0d9488', 700: '#0f766e', 800: '#115e59', 900: '#134e4a' },
+};
+
+/**
+ * Dark mode (beta). Rather than restyling every screen, the scales are turned over: what was the
+ * lightest step of a colour becomes its darkest and the other way round, "white" becomes the card
+ * surface and `ink` runs light-on-dark. A class that read "pale tile, dark text" in light mode reads
+ * "deep tile, light text" here with no change to the component. Yellows are pushed to amber so
+ * light text stays readable on them.
+ */
+const flip = (scale) => {
+  const keys = Object.keys(scale).filter((k) => k !== 'DEFAULT');
+  const out = Object.fromEntries(keys.map((k, i) => [k, scale[keys[keys.length - 1 - i]]]));
+  return out;
+};
+const DARK = {
+  white: { DEFAULT: '#1e1b2c' },
+  ink: { 50: '#1b1829', 100: '#242136', 200: '#34304a', 300: '#4c4766', 400: '#7a7493', 500: '#a09bb6', 600: '#bbb7cd', 700: '#d3d0e1', 800: '#e7e5f0', 900: '#f2f1f8', 950: '#fbfafe' },
+  paper: { DEFAULT: '#1e1b2c', 50: '#1e1b2c', 100: '#191626', 200: '#14121f', 300: '#242136' },
+  magenta: flip(PROCESS.magenta),
+  cyan: flip(PROCESS.cyan),
+  grape: flip(PROCESS.grape),
+  leaf: flip(PROCESS.leaf),
+  sun: { 50: '#2e2208', 100: '#3d2d08', 200: '#57400a', 300: '#7a5a06', 400: '#8f6a04', 500: '#a87c00', 600: '#e0b53a', 700: '#f1cf66', 800: '#fae39a', 900: '#fff5cf' },
+  danger: { 50: '#3a1518', 100: '#4b1a1f', 200: '#6b2229', 500: '#ff6b73', 600: '#ff8a90', 700: '#ffb3b7' },
 };
 
 const channels = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(' ');
@@ -55,54 +84,15 @@ export default {
         mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       colors: {
+        white: 'rgb(var(--white-DEFAULT) / <alpha-value>)',
         ink: skinnable('ink'),
         paper: skinnable('paper'),
         magenta: skinnable('magenta'),
         cyan: skinnable('cyan'),
-        sun: {
-          50: '#fffbe6',
-          100: '#fff5bf',
-          200: '#ffeb85',
-          300: '#ffdf47',
-          400: '#ffd21f',
-          500: '#f2b900',
-          600: '#c98f00',
-          700: '#9a6a04',
-          800: '#73500a',
-          900: '#4d360a',
-        },
-        grape: {
-          50: '#f3f1ff',
-          100: '#e8e4ff',
-          200: '#d3cbff',
-          300: '#b3a5ff',
-          400: '#9078fb',
-          500: '#7352f2',
-          600: '#5d38dc',
-          700: '#4c2bb8',
-          800: '#3d2591',
-          900: '#2a1b63',
-        },
-        leaf: {
-          50: '#ebfbf1',
-          100: '#d1f6df',
-          200: '#a5ecc1',
-          300: '#6bdb9b',
-          400: '#33c274',
-          500: '#16a35a',
-          600: '#0d8348',
-          700: '#0d683c',
-          800: '#0f5232',
-          900: '#0b3822',
-        },
-        danger: {
-          50: '#fff1f1',
-          100: '#ffdfdf',
-          200: '#ffc4c4',
-          500: '#ef3b45',
-          600: '#d81f2e',
-          700: '#b01524',
-        },
+        sun: skinnable('sun'),
+        grape: skinnable('grape'),
+        leaf: skinnable('leaf'),
+        danger: skinnable('danger'),
       },
       borderRadius: {
         '4xl': '2rem',
@@ -162,6 +152,17 @@ export default {
           from: { transform: 'translateX(0)' },
           to: { transform: 'translateX(-50%)' },
         },
+        'pip-bob': { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-7px)' } },
+        'pip-hop': {
+          '0%, 100%': { transform: 'translateY(0) rotate(0deg)' },
+          '35%': { transform: 'translateY(-16px) rotate(-8deg)' },
+          '60%': { transform: 'translateY(0) rotate(4deg)' },
+        },
+        'pip-breathe': { '0%, 100%': { transform: 'scale(1)' }, '50%': { transform: 'scale(1.035)' } },
+        'pip-wobble': { '0%, 100%': { transform: 'rotate(-3deg)' }, '50%': { transform: 'rotate(4deg)' } },
+        'pip-trail': { '0%, 100%': { opacity: '0.25', transform: 'translateX(4px)' }, '50%': { opacity: '1', transform: 'translateX(-3px)' } },
+        'pip-zzz': { '0%': { opacity: '0', transform: 'translateY(6px)' }, '40%': { opacity: '1' }, '100%': { opacity: '0', transform: 'translateY(-8px)' } },
+        'pip-twinkle': { '0%, 100%': { opacity: '0.35', transform: 'scale(0.9)' }, '50%': { opacity: '1', transform: 'scale(1.08)' } },
         confetti: {
           '0%': { transform: 'translateY(0) rotate(0deg)', opacity: '1' },
           '100%': { transform: 'translateY(140px) rotate(320deg)', opacity: '0' },
@@ -179,6 +180,13 @@ export default {
         'pulse-ring': 'pulse-ring 1.8s ease-out infinite',
         marquee: 'marquee 36s linear infinite',
         confetti: 'confetti 1.4s ease-in forwards',
+        'pip-bob': 'pip-bob 2.4s ease-in-out infinite',
+        'pip-hop': 'pip-hop 1.1s cubic-bezier(.3,.7,.3,1) infinite',
+        'pip-breathe': 'pip-breathe 3.2s ease-in-out infinite',
+        'pip-wobble': 'pip-wobble 1.8s ease-in-out infinite',
+        'pip-trail': 'pip-trail 1.2s ease-in-out infinite',
+        'pip-zzz': 'pip-zzz 2.6s ease-in-out infinite',
+        'pip-twinkle': 'pip-twinkle 1.4s ease-in-out infinite',
       },
     },
   },
@@ -187,6 +195,8 @@ export default {
       addBase({
         ':root': { ...vars(PROCESS), '--font-display': '"Bricolage Grotesque Variable"', '--font-sans': '"Figtree Variable"' },
         '.classic': { ...vars(CLASSIC), '--font-display': '"Fraunces Variable"', '--font-sans': '"Plus Jakarta Sans Variable"' },
+        // After .classic on purpose: with both on, dark wins the colours and Classic keeps its fonts.
+        '.dark, .dark .classic': { ...vars(DARK), 'color-scheme': 'dark', '--pip-navy': '#6b7488' },
       }),
     ),
   ],

@@ -38,7 +38,7 @@ export function PlaneGlyph({ className = 'h-7 w-7' }: { className?: string }) {
 export function LogoMark({ className = 'h-10 w-10', tone = 'dark' }: { className?: string; tone?: 'dark' | 'light' }) {
   return (
     <span
-      className={`inline-flex shrink-0 items-center justify-center rounded-[28%] bg-white shadow-soft ${
+      className={`inline-flex shrink-0 items-center justify-center rounded-[28%] bg-[#fff] shadow-soft ${
         tone === 'light' ? '' : 'ring-1 ring-ink-950/10'
       } ${className}`}
     >

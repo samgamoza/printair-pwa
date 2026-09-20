@@ -103,7 +103,7 @@ export default function DesignerOrdersPage() {
 
       <div className="mt-5">
         {shown.length === 0 ? (
-          <EmptyState
+          <EmptyState pip
             icon={filter === 'active' ? Package : PackageCheck}
             tone={filter === 'active' ? 'grape' : 'magenta'}
             title={filter === 'active' ? 'No active commissions right now.' : 'Nothing delivered yet.'}

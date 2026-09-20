@@ -22,6 +22,10 @@ import {
 } from '@/data/catalog';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFlowSkin } from '@/lib/look';
+import { readBudget, stripBudget, withBudget } from '@/delight/budget';
+import { MockupPreview } from '@/delight/MockupPreview';
+import { isPreviewable } from '@/delight/checks';
+import { celebrate } from '@/delight/effects';
 import {
   createProject,
   updateProject,
@@ -53,13 +57,19 @@ type ProjectBuilderProps = {
    * elsewhere the builder falls back to navigating there.
    */
   onWantDesigner?: () => void;
+  /**
+   * "Print again": an earlier project to copy. The builder skips the questions, opens on the details
+   * step and fills everything in from it. Artwork is not copied — files belong to the project they
+   * were uploaded to — so the form asks for it again.
+   */
+  template?: ProjectRow | null;
 };
 
 type Step = 'category' | 'recommend' | 'packaging' | 'quantity' | 'timeline' | 'details' | 'done';
 
 const STEP_ORDER: Step[] = ['category', 'recommend', 'packaging', 'quantity', 'timeline', 'details', 'done'];
 
-export function ProjectBuilder({ open, onClose, initialCategoryId, onWantDesigner }: ProjectBuilderProps) {
+export function ProjectBuilder({ open, onClose, initialCategoryId, onWantDesigner, template }: ProjectBuilderProps) {
   const { session, profile, openSignIn } = useAuth();
   const navigate = useNavigate();
   const skin = useFlowSkin();
@@ -79,6 +89,8 @@ export function ProjectBuilder({ open, onClose, initialCategoryId, onWantDesigne
   const [targetDate, setTargetDate] = useState('');
   const [deliveryCity, setDeliveryCity] = useState('');
   const [notes, setNotes] = useState('');
+  // Shown as its own field, stored as a labelled line at the end of the notes (see delight/budget.ts).
+  const [budget, setBudget] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
 
@@ -94,6 +106,14 @@ export function ProjectBuilder({ open, onClose, initialCategoryId, onWantDesigne
   const draftCreationStarted = useRef(false);
 
   useEffect(() => {
+    if (open && template) {
+      const cat = CATEGORIES.find((c) => c.id === template.category) ?? null;
+      if (cat) {
+        setCategory(cat);
+        setStep('details');
+        return;
+      }
+    }
     if (open && initialCategoryId) {
       const cat = CATEGORIES.find((c) => c.id === initialCategoryId) ?? null;
       if (cat) {
@@ -109,7 +129,7 @@ export function ProjectBuilder({ open, onClose, initialCategoryId, onWantDesigne
       setDeliveryCity((c) => c || profile.city || '');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, initialCategoryId]);
+  }, [open, initialCategoryId, template]);
 
   const reset = () => {
     setStep('category');
@@ -126,6 +146,7 @@ export function ProjectBuilder({ open, onClose, initialCategoryId, onWantDesigne
     setTargetDate('');
     setDeliveryCity(profile?.city ?? '');
     setNotes('');
+    setBudget('');
     setFile(null);
     setFileError(null);
     setError(null);
@@ -199,31 +220,37 @@ export function ProjectBuilder({ open, onClose, initialCategoryId, onWantDesigne
     const qtyObj = QUANTITY_OPTIONS.find((q) => q.value === quantity);
     const tlObj = TIMELINE_OPTIONS.find((t) => t.value === timeline);
 
-    const title = itemObj?.name ?? category.name;
-    const seedNotes = tlObj ? `Timeline preference: ${tlObj.label} (${tlObj.hint}).` : '';
-    const seedDescription = [itemObj?.description, pkgObj ? `Preferred material: ${pkgObj.name}.` : null]
-      .filter(Boolean)
-      .join(' ');
+    const title = template?.title ?? itemObj?.name ?? category.name;
+    const seedNotes = template ? (template.notes ?? '') : tlObj ? `Timeline preference: ${tlObj.label} (${tlObj.hint}).` : '';
+    const seedDescription =
+      template?.description ??
+      [itemObj?.description, pkgObj ? `Preferred material: ${pkgObj.name}.` : null].filter(Boolean).join(' ');
 
     createProject({
       customerId: profile.id,
       title,
       category: category.id,
       description: seedDescription,
-      quantityNote: qtyObj?.label ?? null,
-      materialPref: pkgObj?.name ?? (category.specialFlow ? null : null),
-      deliveryCity: profile.city ?? '',
+      quantityNote: template?.quantity_note ?? qtyObj?.label ?? null,
+      materialPref: template?.material_pref ?? pkgObj?.name ?? (category.specialFlow ? null : null),
+      deliveryCity: template?.delivery_city ?? profile.city ?? '',
       notes: seedNotes,
     })
       .then((p) => {
         setDraft(p);
         setDescription(p.description ?? '');
-        setNotes(p.notes ?? '');
+        setNotes(stripBudget(p.notes));
+        setBudget(readBudget(p.notes));
         setDeliveryCity(p.delivery_city ?? profile.city ?? '');
+        if (template) {
+          setExactQuantity(template.quantity ? String(template.quantity) : '');
+          setSizeSpec(template.size_spec ?? '');
+          setFinishingPref(template.finishing_pref ?? '');
+        }
       })
       .catch(() => setError('Could not start your project. Please try again.'))
       .finally(() => setCreatingDraft(false));
-  }, [step, session, profile, draft, creatingDraft, category, item, packaging, quantity, timeline]);
+  }, [step, session, profile, draft, creatingDraft, category, item, packaging, quantity, timeline, template]);
 
   async function persistFields(): Promise<ProjectRow | null> {
     if (!draft) return null;
@@ -234,7 +261,7 @@ export function ProjectBuilder({ open, onClose, initialCategoryId, onWantDesigne
       finishing_pref: finishingPref || null,
       target_date: targetDate || null,
       delivery_city: deliveryCity,
-      notes,
+      notes: withBudget(notes, budget),
     });
     setDraft(updated);
     return updated;
@@ -282,6 +309,7 @@ export function ProjectBuilder({ open, onClose, initialCategoryId, onWantDesigne
       await persistFields();
       await submitProject(draft.id);
       setStep('done');
+      celebrate();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong while sending your project. Please try again.');
     } finally {
@@ -446,6 +474,9 @@ export function ProjectBuilder({ open, onClose, initialCategoryId, onWantDesigne
                 setDeliveryCity={setDeliveryCity}
                 notes={notes}
                 setNotes={setNotes}
+                budget={budget}
+                setBudget={setBudget}
+                reorderOf={template?.title ?? null}
                 file={file}
                 fileError={fileError}
                 onFileChange={handleFileChange}
@@ -720,6 +751,9 @@ function DetailsStep({
   setDeliveryCity,
   notes,
   setNotes,
+  budget,
+  setBudget,
+  reorderOf,
   file,
   fileError,
   onFileChange,
@@ -743,6 +777,9 @@ function DetailsStep({
   setDeliveryCity: (v: string) => void;
   notes: string;
   setNotes: (v: string) => void;
+  budget: string;
+  setBudget: (v: string) => void;
+  reorderOf: string | null;
   file: File | null;
   fileError: string | null;
   onFileChange: (f: File | null) => void;
@@ -759,6 +796,13 @@ function DetailsStep({
   return (
     <div className="animate-fade-up">
       <StepHeading title={heading} subtitle={sub} />
+
+      {reorderOf && (
+        <Banner tone="success" className="mb-5">
+          Printing &ldquo;{reorderOf}&rdquo; again. Everything is filled in from last time: change what you need, add your artwork, and
+          send. Printing partners will quote it fresh.
+        </Banner>
+      )}
 
       {(isSample || isExpert) && (
         <Banner tone="info" className="mb-5">
@@ -787,6 +831,16 @@ function DetailsStep({
 
         <TextField label="Delivery city" value={deliveryCity} onChange={setDeliveryCity} placeholder="e.g. Pasig City" required />
 
+        <TextField
+          label="Your budget (optional)"
+          type="number"
+          inputMode="numeric"
+          value={budget}
+          onChange={setBudget}
+          placeholder="e.g. 5000"
+          hint="In pesos. Printing partners see it and quote what fits, or suggest the closest option."
+        />
+
         <TextAreaField
           label={`Notes ${isSample || isExpert ? '(helpful)' : '(optional)'}`}
           rows={2}
@@ -797,7 +851,10 @@ function DetailsStep({
 
         <Field label="Artwork or reference file (optional)" error={fileError}>
           {file ? (
-            <FileRow name={file.name} size={file.size} onRemove={() => onFileChange(null)} />
+            <div className="space-y-3">
+              <FileRow name={file.name} size={file.size} onRemove={() => onFileChange(null)} />
+              {isPreviewable(file) && <MockupPreview file={file} />}
+            </div>
           ) : (
             <Dropzone
               accept=".pdf,.jpg,.jpeg,.png,.ai,.zip"

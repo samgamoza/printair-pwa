@@ -3,12 +3,16 @@ import type { LucideIcon } from 'lucide-react';
 import { AlertTriangle, CheckCircle2, Info, WifiOff } from 'lucide-react';
 import { Button } from './Button';
 import { InkLoader, RegistrationMark } from './Marks';
+import { Pip } from '@/delight/Mascot';
+import { useSay } from '@/delight/prefs';
 
-export function PageLoader({ label = 'Loading…' }: { label?: string }) {
+export function PageLoader({ label }: { label?: string }) {
+  const say = useSay();
   return (
-    <div className="flex flex-col items-center justify-center gap-4 py-24 text-ink-500">
-      <InkLoader className="[&>span]:h-3.5 [&>span]:w-3.5" />
-      <p className="text-sm font-medium">{label}</p>
+    <div className="flex flex-col items-center justify-center gap-3 py-20 text-ink-500" role="status">
+      <Pip mood="carry" className="h-24 w-24" />
+      <InkLoader className="[&>span]:h-2.5 [&>span]:w-2.5" label={label ?? 'Loading'} />
+      <p className="text-sm font-medium">{label ?? say('Loading…', 'Sandali ha, on the way…')}</p>
     </div>
   );
 }
@@ -34,12 +38,15 @@ export function EmptyState({
   body,
   action,
   tone = 'sun',
+  pip = false,
 }: {
   icon: LucideIcon;
   title: string;
   body?: ReactNode;
   action?: ReactNode;
   tone?: 'sun' | 'cyan' | 'magenta' | 'grape';
+  /** Pip naps beside the icon. Opt in on the screens where "nothing here yet" is the normal, friendly state; never on admin, "not found" or locked screens. */
+  pip?: boolean;
 }) {
   const tints = {
     sun: 'bg-sun-200 text-ink-950',
@@ -51,9 +58,12 @@ export function EmptyState({
     <div className="relative overflow-hidden rounded-4xl border-2 border-dashed border-ink-200 bg-white/60 px-6 py-14 text-center">
       <RegistrationMark className="absolute left-4 top-4 h-5 w-5 text-ink-200" />
       <RegistrationMark className="absolute bottom-4 right-4 h-5 w-5 text-ink-200" />
-      <span className={`mx-auto flex h-16 w-16 -rotate-6 items-center justify-center rounded-3xl ${tints[tone]}`}>
-        <Icon className="h-8 w-8" strokeWidth={1.75} />
-      </span>
+      <div className="flex items-end justify-center gap-1">
+        <span className={`flex h-16 w-16 -rotate-6 items-center justify-center rounded-3xl ${tints[tone]}`}>
+          <Icon className="h-8 w-8" strokeWidth={1.75} />
+        </span>
+        {pip && <Pip mood="nap" className="-mb-2 h-20 w-20" />}
+      </div>
       <h3 className="mt-5 text-xl text-ink-950">{title}</h3>
       {body && <p className="mx-auto mt-2 max-w-sm text-ink-600">{body}</p>}
       {action && <div className="mt-6 flex justify-center">{action}</div>}

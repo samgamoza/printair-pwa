@@ -1,3 +1,4 @@
+import { celebrate } from '@/delight/effects';
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Check, SearchX, X } from 'lucide-react';
@@ -52,6 +53,7 @@ export default function CheckoutReturnPage() {
         const payment = kind === 'design' ? await getDesignBookingPayment(id) : await getBookingPayment(id);
         if (payment?.status === 'paid') {
           setOutcome('paid');
+          celebrate();
           return;
         }
         if (payment?.status === 'failed' || payment?.status === 'expired') {

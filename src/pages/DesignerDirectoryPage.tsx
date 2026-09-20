@@ -108,7 +108,7 @@ export default function DesignerDirectoryPage() {
           <ErrorState title="Couldn't load designers" message={error} onRetry={load} />
         ) : shown.length === 0 ? (
           designers.length === 0 ? (
-            <EmptyState icon={Palette} tone="grape" title="No designers have been approved yet." body="Check back soon." />
+            <EmptyState pip icon={Palette} tone="grape" title="No designers have been approved yet." body="Check back soon." />
           ) : needle ? (
             <EmptyState
               icon={SearchX}

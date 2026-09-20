@@ -48,3 +48,22 @@ Carried over as they were, because closing them needs product decisions or backe
 - Portfolio uploads accept a caption in the API (`uploadPortfolioItem(id, file, caption)`), but the designer profile screen has never asked for one.
 - The decline dialog on an opportunity says "you can still change your mind and quote later", but once declined the page hides the quote form.
 - There is no in-app notification inbox; notifications are email only. Web push would be the natural next step for the installed app (needs VAPID keys, a subscriptions table and a change to `send-notifications`).
+
+## 5. The "delight" features: what the front end does today, and what the backend would add
+
+Added 2026-09-20 in `src/delight/`. Everything below works now without any backend change. Each one has a bigger version that does need the backend; none of it has been built, and none of it should be until the owner picks a front end (see `supabase/README.md`).
+
+| Feature | What works today (front end only) | What the backend would add |
+| --- | --- | --- |
+| **Suki status** | A badge and progress bar from the customer's count of delivered projects. Recognition only; it promises no perks. | Real perks (a lower platform fee, priority matching) are business rules. They need an owner decision first, then a server-side rule in `create-booking-checkout` so the fee cannot be edited from the browser. |
+| **Invite a ka-negosyo** | Shares the app's address through the phone's share sheet. | Referral rewards need a `referrals` table (who invited whom), a code on sign-up, and a rule for when the reward is earned (first delivered order, not sign-up, or it will be farmed). |
+| **Ask someone's opinion** | Shares a plain-text summary of the quotes (partner, price, days) to any chat app. | A private read-only link where a business partner can view and vote needs a `project_shares` table with an unguessable token and an RLS policy for it. |
+| **Order progress ("Pip is printing…")** | Restates the order's real status as a friendly sentence and a four-step bar. | A photo from the printer at each step needs an `order_event_photos` column or table, a storage bucket and an upload control on the partner's status screen. |
+| **Your budget** | One labelled line at the end of the project's notes ("Target budget: ₱5,000. …"), which partners already read. | A real `budget` column on `projects` would let partners filter opportunities by it and let the assistant suggest what fits. |
+| **Preview on a product** | Draws the customer's image on a simple cup, box or bag, on the device. Captioned as not a print proof. | True-to-size mockups per catalog item need templates per product and, ideally, server-side rendering. |
+| **Show it off** | Builds a Stories-sized picture on the device and hands it to the share sheet. | If customers may opt in to a public gallery, that needs a consent flag, a moderation queue and a public read policy. This is also how the sample "Ideas to start from" become real stories. |
+| **Top-rated printing partners** | Top three from the existing public directory, shown only when partners have real reviews. | Nothing needed. A monthly "partner of the month" would need a small view over reviews by month. |
+| **Season kits** | Fixed dates and cautious lead times in `src/delight/seasons.ts`. | Lead times should come from real partner turnaround once there is order history. |
+| **Sounds, confetti, Taglish, dark mode** | Saved on the device only (`localStorage`, key `printair.prefs`). | Nothing needed. Saving them to the profile would make them follow the person across devices. |
+
+Web push ("You have a new quote") is still the single most valuable missing piece for an installed app; it is described at the end of section 4.

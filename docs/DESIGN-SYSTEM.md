@@ -86,3 +86,10 @@ npm run lint        # no errors
 npm test            # 76 unit tests
 npm run build
 ```
+
+## Pip, voice and dark mode (added 2026-09-20)
+
+- **Pip** — `src/delight/Mascot.tsx`. Moods: `fly`, `carry`, `cheer`, `nap`, `oops`. Drawn in code in the logo's navy and orange, but it is not the logo and never replaces it. Sizes: `h-20 w-20` beside text, `h-24 w-24` alone. Where Pip may appear is listed in `AGENT-HANDOFF.md` §6a.
+- **Voice** — `useSay()` returns `(english, taglish) => string`. Write the English first; add Taglish only where a smile costs nothing.
+- **Dark mode** — every palette, including `white`, is a CSS variable, and `.dark` on `<html>` swaps in the `DARK` set from `tailwind.config.js`. Scales are flipped, so `bg-white` becomes the dark surface and `text-ink-950` becomes near-white: existing screens work without `dark:` classes. Use a literal (`bg-[#fff]`, `text-[#fff]`) only when a colour must not flip. Labelled Beta until it has had a real-device pass.
+- **Effects** — `src/delight/effects.ts`. Confetti uses the Web Animations API (no library), sounds are synthesised (no audio files), both are skipped for reduced motion or when the device switch is off.

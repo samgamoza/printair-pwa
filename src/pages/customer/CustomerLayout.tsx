@@ -4,6 +4,7 @@ import { ArrowRight, FolderKanban, Palette, Printer } from 'lucide-react';
 import { AppShell, type ShellNavItem } from '@/components/shell/AppShell';
 import { Sheet } from '@/components/ui/Sheet';
 import { ProjectBuilder } from '@/components/ProjectBuilder';
+import type { ProjectRow } from '@/lib/api/projects';
 import { DesignRequestBuilder } from '@/components/DesignRequestBuilder';
 import { CreateContext, type CreateValue } from './createContext';
 import { PageLoader } from '@/components/ui/states';
@@ -25,6 +26,7 @@ export default function CustomerLayout() {
   const [chooserOpen, setChooserOpen] = useState(false);
   const [projectOpen, setProjectOpen] = useState(false);
   const [projectCategory, setProjectCategory] = useState<string | null>(null);
+  const [projectTemplate, setProjectTemplate] = useState<ProjectRow | null>(null);
   const [designOpen, setDesignOpen] = useState(false);
   const [version, setVersion] = useState(0);
 
@@ -43,6 +45,14 @@ export default function CustomerLayout() {
   const startProject = useCallback((categoryId?: string | null) => {
     setChooserOpen(false);
     setProjectCategory(categoryId ?? null);
+    setProjectTemplate(null);
+    setProjectOpen(true);
+  }, []);
+
+  const reorder = useCallback((project: ProjectRow) => {
+    setChooserOpen(false);
+    setProjectCategory(null);
+    setProjectTemplate(project);
     setProjectOpen(true);
   }, []);
 
@@ -53,7 +63,7 @@ export default function CustomerLayout() {
     setDesignOpen(true);
   }, [pathname, navigate]);
 
-  const value = useMemo<CreateValue>(() => ({ startProject, startDesign, version }), [startProject, startDesign, version]);
+  const value = useMemo<CreateValue>(() => ({ startProject, startDesign, reorder, version }), [startProject, startDesign, reorder, version]);
 
   return (
     <CreateContext.Provider value={value}>
@@ -106,9 +116,11 @@ export default function CustomerLayout() {
         open={projectOpen}
         onClose={() => {
           setProjectOpen(false);
+          setProjectTemplate(null);
           setVersion((v) => v + 1);
         }}
         initialCategoryId={projectCategory}
+        template={projectTemplate}
         onWantDesigner={startDesign}
       />
       <DesignRequestBuilder
