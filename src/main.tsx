@@ -30,6 +30,13 @@ async function start() {
     const [{ installDemoBackend }, switcher] = await Promise.all([import('./demo/install'), import('./demo/DemoSwitcher')]);
     installDemoBackend();
     DemoSwitcher = switcher.DemoSwitcher;
+  } else {
+    // Weak or no connection: fall back to what this person last saw, and say so. Has to be in place
+    // before the Supabase client is created, like the demo backend above. (Demo mode has no network
+    // to lose, so it doesn't need it.)
+    const { installLastSeen, keepStorage } = await import('./pwa/lastSeen');
+    installLastSeen(import.meta.env.VITE_SUPABASE_URL as string);
+    keepStorage();
   }
 
   const [{ default: App }, { AuthProvider }, { DialogsProvider }, { ErrorBoundary }] = await Promise.all([

@@ -110,6 +110,13 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         // The app shell: everything the build emits.
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        // Installing the app downloads everything listed above in the background — on a weak
+        // connection that competes with the person's first screens. So only what is needed to run
+        // is precached: the Latin cut of each font (Filipino and English need nothing else; the
+        // other alphabets are fetched and kept the first time a page actually uses them), and not
+        // the link-preview picture or the home-screen icons, which the phone and social networks fetch
+        // for themselves and the running app never draws.
+        globIgnores: ['**/*-{latin-ext,vietnamese,cyrillic,cyrillic-ext,greek,greek-ext}-*.woff2', 'share-card.png', 'icons/**'],
         // Any in-app URL opened offline falls back to the shell, which renders its own offline state.
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/(rest|auth|storage|functions|realtime)\/v1\//],
@@ -127,6 +134,12 @@ export default defineConfig(({ mode }) => ({
               url.hostname === '127.0.0.1' ||
               url.hostname === 'localhost',
             handler: 'NetworkOnly',
+          },
+          {
+            // Font cuts left out of the precache above: kept for good once used (their names are hashed).
+            urlPattern: ({ url, sameOrigin }) => sameOrigin && /\/assets\/.*\.woff2$/.test(url.pathname),
+            handler: 'CacheFirst',
+            options: { cacheName: 'printair-fonts', expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 365 } },
           },
           {
             // Category and story photographs: fine to keep, cheap to refresh.

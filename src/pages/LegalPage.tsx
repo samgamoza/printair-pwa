@@ -65,7 +65,8 @@ const PRIVACY: Section[] = [
         </li>
         <li>
           <b>On your device:</b> small settings saved in your browser, such as staying signed in and whether you dismissed the install
-          banner. PrintAir has no advertising trackers.
+          banner, plus a copy of the screens you last viewed so the app still opens on a weak connection. That copy never leaves your
+          device and is erased when you sign out. PrintAir has no advertising trackers.
         </li>
       </ul>
     ),

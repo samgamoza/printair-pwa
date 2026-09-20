@@ -8,6 +8,7 @@ import { FilterTabs } from '@/components/ui/bits';
 import { ColorBar, CropMarks, RegistrationMark } from '@/components/ui/Marks';
 import { InstallBanner } from '@/pwa/InstallPrompt';
 import { useAuth } from '@/contexts/AuthContext';
+import { isConstrained, whenIdleAndUnconstrained } from '@/pwa/connection';
 import { CATEGORIES, INSPIRATION_ITEMS } from '@/data/catalog';
 
 // The builder and the assistant are the two heaviest things on this page and neither is needed to
@@ -26,6 +27,24 @@ const STORIES_ARE_REAL = false;
 /** The same filters the website offers over the inspiration cards. */
 const STORY_FILTERS = ['All', 'Coffee Shop', 'Bakery', 'Beauty and Skincare', 'Retail', 'Product Packaging', 'Labels and Stickers'] as const;
 type StoryFilter = (typeof STORY_FILTERS)[number];
+
+/**
+ * The catalogue's photographs are 940×650; a card shows them at 352×192. Ask the image host for the
+ * size actually drawn (and twice that for sharp screens) — about a fifth of the download.
+ */
+function sized(url: string, w: number, h: number): string {
+  try {
+    const u = new URL(url);
+    if (!u.hostname.endsWith('pexels.com')) return url;
+    u.searchParams.set('w', String(w));
+    u.searchParams.set('h', String(h));
+    u.searchParams.set('fit', 'crop');
+    u.searchParams.set('auto', 'compress');
+    return u.toString();
+  } catch {
+    return url;
+  }
+}
 
 const TILE_TINTS = ['bg-cyan-200', 'bg-magenta-200', 'bg-sun-200', 'bg-grape-200', 'bg-leaf-200'];
 
@@ -63,6 +82,7 @@ export default function LandingPage() {
     [storyFilter],
   );
   const [builderWanted, setBuilderWanted] = useState(false);
+  const [lean] = useState(isConstrained);
   const [assistantReady, setAssistantReady] = useState(false);
   const { hash, key: navKey } = useLocation();
 
@@ -78,8 +98,9 @@ export default function LandingPage() {
   useEffect(() => {
     const t = window.setTimeout(() => {
       setAssistantReady(true);
-      // Warm the builder too, so the first tap on "Start a project" doesn't wait on the network.
-      void import('@/components/ProjectBuilder');
+      // Warm the builder too, so the first tap on "Start a project" doesn't wait on the network —
+      // unless the connection is one where downloading ahead of need would only get in the way.
+      whenIdleAndUnconstrained(() => void import('@/components/ProjectBuilder'));
     }, 1500);
     return () => window.clearTimeout(t);
   }, []);
@@ -225,15 +246,22 @@ export default function LandingPage() {
               >
                 <div className={`relative h-48 ${TILE_TINTS[i % TILE_TINTS.length]}`}>
                   <span className="pointer-events-none absolute inset-0 bg-halftone bg-dots text-ink-950/10" aria-hidden="true" />
+                  {/* Decorative, so skipped entirely on a data-saving or 2G connection: the tinted tile stands in. */}
+                  {!lean && (
                   <img
-                    src={item.image}
+                    src={sized(item.image, 360, 200)}
+                    srcSet={`${sized(item.image, 360, 200)} 1x, ${sized(item.image, 720, 400)} 2x`}
                     alt=""
+                    width={360}
+                    height={200}
                     loading="lazy"
+                    decoding="async"
                     className="absolute inset-0 h-full w-full object-cover"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
                     }}
                   />
+                  )}
                   <span className="absolute left-4 top-4 rounded-full bg-white px-3 py-1 text-xs font-extrabold text-ink-950">{item.category}</span>
                 </div>
                 <div className="flex flex-1 flex-col p-5">

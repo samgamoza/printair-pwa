@@ -1,12 +1,15 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import LandingPage from '@/pages/LandingPage';
 import { ProtectedRoute } from '@/routes/ProtectedRoute';
 import AppEntry from '@/pwa/AppEntry';
 import OfflinePage from '@/pwa/OfflinePage';
 import { UpdateToast } from '@/pwa/UpdateToast';
+import { StaleStrip } from '@/pwa/StaleStrip';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { PageLoader } from '@/components/ui/states';
+import { useAuth } from '@/contexts/AuthContext';
+import { whenIdleAndUnconstrained } from '@/pwa/connection';
 
 // Every screen except the welcome page loads on demand, so a customer never downloads the partner,
 // designer or admin areas. The service worker still precaches all of them, so they open offline too.
@@ -56,6 +59,37 @@ const AdminDesignReviewsPage = lazy(() => import('@/pages/admin/AdminDesignRevie
  * route is shared, so a designer can be linked straight to /designer from
  * either hostname.
  */
+/**
+ * The screens each kind of account opens most. Once we know who is signed in, their code is fetched
+ * while the browser is idle, so moving between tabs never waits on the network — the first visit
+ * included, before the service worker has finished saving the whole app. Skipped on data-saving and
+ * 2G connections.
+ */
+const ROLE_SCREENS: Record<string, (() => Promise<unknown>)[]> = {
+  customer: [
+    () => import('@/pages/customer/CustomerLayout'),
+    () => import('@/pages/customer/ProjectsListPage'),
+    () => import('@/pages/customer/ProjectDetailPage'),
+    () => import('@/pages/customer/DesignRequestsListPage'),
+    () => import('@/components/ProjectBuilder'),
+  ],
+  partner: [
+    () => import('@/pages/partner/PartnerLayout'),
+    () => import('@/pages/partner/PartnerHomePage'),
+    () => import('@/pages/partner/OpportunitiesPage'),
+    () => import('@/pages/partner/OpportunityDetailPage'),
+    () => import('@/pages/partner/ActiveProjectsPage'),
+    () => import('@/pages/partner/MyQuotationsPage'),
+  ],
+  designer: [
+    () => import('@/pages/designer/DesignerLayout'),
+    () => import('@/pages/designer/DesignerHomePage'),
+    () => import('@/pages/designer/DesignerOpportunitiesPage'),
+    () => import('@/pages/designer/DesignerOrdersPage'),
+  ],
+  admin: [() => import('@/pages/admin/AdminLayout'), () => import('@/pages/admin/AdminUsersPage')],
+};
+
 function isDesignerHost() {
   if (typeof window === 'undefined') return false;
   return window.location.hostname.startsWith('design.');
@@ -63,6 +97,12 @@ function isDesignerHost() {
 
 export default function App() {
   const designerFrontDoor = isDesignerHost();
+  const role = useAuth().profile?.role;
+
+  useEffect(() => {
+    if (!role) return;
+    whenIdleAndUnconstrained(() => ROLE_SCREENS[role]?.forEach((load) => void load().catch(() => {})));
+  }, [role]);
 
   return (
     <>
@@ -153,6 +193,7 @@ export default function App() {
       </Suspense>
       <AuthModal />
       <UpdateToast />
+      <StaleStrip />
     </>
   );
 }
