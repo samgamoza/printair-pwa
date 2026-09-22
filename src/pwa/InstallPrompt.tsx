@@ -153,7 +153,7 @@ export function InstallBanner({ className = '' }: { className?: string }) {
     <>
       <div className={`relative flex items-center gap-3 overflow-hidden rounded-3xl bg-ink-950 p-3 pr-2 text-white ${className}`}>
         <span className="pointer-events-none absolute -right-6 -top-10 h-28 w-40 bg-halftone bg-dots text-white/15" aria-hidden="true" />
-        <LogoMark className="h-11 w-11" tone="light" />
+        <LogoMark className="h-11 w-11" />
         <div className="min-w-0 flex-1">
           <p className="font-bold leading-tight">Get the PrintAir app</p>
           <p className="truncate text-sm text-white/65">One tap from your home screen. No app store.</p>

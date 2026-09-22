@@ -4,9 +4,14 @@
  * The logo is PrintAir's own artwork, used exactly as supplied: the CMYK paper
  * plane with its motion lines, and the PRINTAIR wordmark. `npm run icons` cuts
  * the plane from `brand/printair-mark-source.png` into `src/assets/brand/` (what
- * the app renders) and `public/` (favicon, home-screen icons, manifest). The
- * mark always sits on a white tile — its glow needs a light ground, and on the
- * ink side rail the black fold would otherwise disappear.
+ * the app renders) and `public/` (favicon, home-screen icons, manifest).
+ *
+ * The mark is drawn straight onto the surface, at full size. It used to sit on
+ * a white rounded tile, which the previous navy plane needed to survive the ink
+ * side rail; this artwork carries its own light glow, so it holds on both the
+ * paper and the rail on its own — and reads a third larger in the same space.
+ * The home-screen icons keep a white tile, which `npm run icons` adds: a phone
+ * draws them on whatever wallpaper it likes.
  *
  * The artwork is imported, not referenced by a fixed path under public/, so
  * Vite gives each file a content-hashed name. A fixed name is a trap for
@@ -36,16 +41,8 @@ export function PlaneGlyph({ className = 'h-7 w-7' }: { className?: string }) {
  * The plane on its white tile — the app icon. `tone` is kept so callers don't
  * change; on dark backgrounds the tile drops its border, that's all.
  */
-export function LogoMark({ className = 'h-10 w-10', tone = 'dark' }: { className?: string; tone?: 'dark' | 'light' }) {
-  return (
-    <span
-      className={`inline-flex shrink-0 items-center justify-center rounded-[28%] bg-[#fff] shadow-soft ${
-        tone === 'light' ? '' : 'ring-1 ring-ink-950/10'
-      } ${className}`}
-    >
-      <PlaneGlyph className="h-[78%] w-[78%]" />
-    </span>
-  );
+export function LogoMark({ className = 'h-10 w-10' }: { className?: string }) {
+  return <PlaneGlyph className={`shrink-0 ${className}`} />;
 }
 
 export function Logo({
@@ -59,7 +56,7 @@ export function Logo({
 }) {
   return (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
-      <LogoMark className={markClassName} tone={tone} />
+      <LogoMark className={markClassName} />
       {/* The owner's wordmark artwork, used as-is (src/assets/brand/). PRINT in ink, AIR in
           cyan / magenta / yellow — the CMYK the whole brand is built on. The light copy
           is the same file with the ink turned white, for the dark shell; the colours
