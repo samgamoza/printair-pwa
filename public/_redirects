@@ -1,10 +1,15 @@
-# Cloudflare Pages SPA rewrite.
+# Single-page-app routing is handled by wrangler.jsonc, not from here.
 #
-# react-router-dom uses client-side routing, so every path must serve
-# index.html or a hard refresh on e.g. /designer/opportunities/:id 404s.
-# Same rule netlify.toml already declares for Netlify — Pages reads this
-# file from the build output instead, and Vite copies public/ into dist/.
+# react-router-dom needs every path to serve index.html, or a hard refresh on
+# e.g. /designer/opportunities/:id 404s. On Cloudflare Workers that is
+# `assets.not_found_handling: "single-page-application"` in wrangler.jsonc.
 #
-# Kept last-resort (200, not 301): it rewrites rather than redirects, so the
-# URL the user sees is preserved and the router can read it.
-/*    /index.html   200
+# The old rule here — `/*  /index.html  200` — is REJECTED by Workers with
+# "Infinite loop detected" [code: 100324]: Workers rewrites /index.html back
+# to /, which re-matches /* forever. Cloudflare Pages accepted the same rule,
+# so restore it only if this app is ever moved back to Pages. Netlify has its
+# own copy in netlify.toml; Vercel's is in vercel.json.
+#
+# This file is kept, without rules, so the absence of a rewrite here is
+# deliberate rather than an oversight. public/_headers still carries the
+# no-cache rules for the service worker and the manifest.
