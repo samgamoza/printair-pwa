@@ -68,7 +68,12 @@ const square = await sharp({ create: { width: side, height: side, channels: 4, b
 
 // 256px covers the largest place the mark appears in the app (a 56px tile on a 3x screen) at a
 // quarter of the download. The icons below are cut from the full-size source, not from this file.
-await sharp(square).resize(256, 256).png({ compressionLevel: 9 }).toFile(new URL('logo-mark.png', out).pathname);
+const markPng = await sharp(square).resize(256, 256).png({ compressionLevel: 9 }).toBuffer();
+// public/ copy: for the manifest and anything outside the bundle. src/assets copy: what the app
+// renders, imported so Vite hashes its name and a replaced logo is never served from cache.
+await sharp(markPng).toFile(new URL('logo-mark.png', out).pathname);
+await mkdir(new URL('src/assets/brand/', root), { recursive: true });
+await sharp(markPng).toFile(new URL('src/assets/brand/logo-mark.png', root).pathname);
 
 /* ---------- 2. App icons: the mark on a white tile ---------- */
 
@@ -103,4 +108,4 @@ await Promise.all([
   png(glyph({ bg: '#f9c101', draw: '<path d="M24 38l24-12 24 12v26a6 6 0 0 1-6 6H30a6 6 0 0 1-6-6z" fill="none" stroke="#0f0d1a" stroke-width="7" stroke-linejoin="round"/><path d="M24 40l24 14 24-14" fill="none" stroke="#0f0d1a" stroke-width="7" stroke-linejoin="round"/>' }), 'icons/shortcut-opps.png'),
 ]);
 
-console.log('Logo written to public/logo-mark.png; icons to public/ and public/icons/');
+console.log('Logo written to public/logo-mark.png and src/assets/brand/logo-mark.png; icons to public/ and public/icons/');

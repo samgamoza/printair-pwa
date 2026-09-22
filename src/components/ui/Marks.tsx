@@ -1,26 +1,28 @@
 /**
  * Brand marks and print-shop ornaments.
  *
- * The logo is PrintAir's own artwork, used exactly as supplied: the navy and
- * orange paper plane with its speed lines. It lives in `public/logo-mark.png`
- * (cut out from `brand/printair-mark-source.png` by `npm run icons`), so the
- * same file feeds the app, the favicon and the home-screen icons. Because the
- * plane's body is navy, the mark always sits on a white tile — on the ink side
- * rail or a dark sheet it would otherwise disappear.
+ * The logo is PrintAir's own artwork, used exactly as supplied: the CMYK paper
+ * plane with its motion lines, and the PRINTAIR wordmark. `npm run icons` cuts
+ * the plane from `brand/printair-mark-source.png` into `src/assets/brand/` (what
+ * the app renders) and `public/` (favicon, home-screen icons, manifest). The
+ * mark always sits on a white tile — its glow needs a light ground, and on the
+ * ink side rail the black fold would otherwise disappear.
+ *
+ * The artwork is imported, not referenced by a fixed path under public/, so
+ * Vite gives each file a content-hashed name. A fixed name is a trap for
+ * artwork: replace the file, keep the name, and every browser and installed
+ * service worker keeps showing the old one from cache.
  *
  * The ornaments further down are drawn in code so they stay crisp at any size.
  */
-
-/**
- * The orange in the supplied logo, used for "Air" in the wordmark so the lockup reads as one piece.
- * On light backgrounds the logo's own orange is too pale to read as text (2.5:1), so the wordmark
- * uses a deeper cut of the same hue there. The artwork itself is never recoloured.
- */
+import logoMark from '@/assets/brand/logo-mark.png';
+import wordmark from '@/assets/brand/wordmark.png';
+import wordmarkLight from '@/assets/brand/wordmark-light.png';
 
 export function PlaneGlyph({ className = 'h-7 w-7' }: { className?: string }) {
   return (
     <img
-      src="/logo-mark.png"
+      src={logoMark}
       alt=""
       aria-hidden="true"
       draggable={false}
@@ -58,7 +60,7 @@ export function Logo({
   return (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
       <LogoMark className={markClassName} tone={tone} />
-      {/* The owner's wordmark artwork, used as-is (public/brand/). PRINT in ink, AIR in
+      {/* The owner's wordmark artwork, used as-is (src/assets/brand/). PRINT in ink, AIR in
           cyan / magenta / yellow — the CMYK the whole brand is built on. The light copy
           is the same file with the ink turned white, for the dark shell; the colours
           are untouched in both. Height is set, width follows, so it never distorts.
@@ -66,7 +68,7 @@ export function Logo({
           10:1, so every pixel of height is ten of width, and the header has to share. */}
       <img
         data-wordmark
-        src={tone === 'light' ? '/brand/wordmark-light.png' : '/brand/wordmark.png'}
+        src={tone === 'light' ? wordmarkLight : wordmark}
         alt="PrintAir"
         draggable={false}
         className="h-4 w-auto select-none"
