@@ -98,7 +98,7 @@ async function draw(canvas: HTMLCanvasElement, opts: { title: string; category: 
   }
 
   // footer: colour bar + credit
-  const inks = ['#22bdf0', '#ee2a8b', '#ffd21f', '#0f0d1a'];
+  const inks = ['#0094de', '#e6017f', '#f9c101', '#0f0d1a'];
   inks.forEach((c, i) => {
     ctx.fillStyle = c;
     ctx.beginPath();

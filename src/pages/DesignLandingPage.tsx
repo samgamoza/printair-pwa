@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Palette, ShieldCheck, Workflow, ArrowRight } from 'lucide-react';
 import { MarketingHeader, MarketingFooter } from '@/components/marketing/Chrome';
@@ -19,9 +20,10 @@ import { DESIGN_SPECIALTIES } from '@/data/catalog';
  * stops this being a race to the bottom on price.
  */
 export default function DesignLandingPage() {
-  const { openJoinDesigner, openSignIn, profile } = useAuth();
-
+  const { openSignIn, profile } = useAuth();
   const navigate = useNavigate();
+  // Applying is a page now, not a sheet.
+  const openJoinDesigner = useCallback(() => navigate('/signup?role=designer'), [navigate]);
   const alreadyDesigner = profile?.role === 'designer';
 
   const tiles = ['bg-sun-200', 'bg-cyan-200', 'bg-magenta-200', 'bg-grape-200'];

@@ -31,3 +31,6 @@ supabase/.branches
 
 # TypeScript incremental build state
 *.tsbuildinfo
+
+# Wrangler local state: build cache and deploy metadata.
+.wrangler

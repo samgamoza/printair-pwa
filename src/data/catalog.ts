@@ -369,6 +369,38 @@ export const DESIGN_SPECIALTIES: { id: string; name: string; tagline: string }[]
 ];
 
 /**
+ * What a customer can ask to have designed, in their words.
+ *
+ * DESIGN_SPECIALTIES above is the designer's side: the four disciplines a
+ * designer says they practise, and what a request is matched on. Customers
+ * were shown that same list and asked to pick a "specialty" — a question about
+ * the designer, not about their own job, which is why "Product Graphics" meant
+ * nothing to someone who just wanted a menu.
+ *
+ * Each need here maps to the specialty that does that work, so matching is
+ * unchanged. Several needs share one specialty on purpose: a menu and a flyer
+ * are both product graphics to a designer, but not to the café owner.
+ */
+export const DESIGN_NEEDS: { id: string; name: string; short: string; tagline: string; specialty: string; example: string }[] = [
+  { id: 'logo', name: 'Logo & brand mark', short: 'Logo', tagline: 'A logo or wordmark to build everything else on.', specialty: 'logo', example: 'Logo for a new coffee shop' },
+  { id: 'labels', name: 'Labels & stickers', short: 'Labels', tagline: 'Jar, bottle and product labels, or a sticker sheet.', specialty: 'label', example: 'Labels for three sauce flavours' },
+  { id: 'box', name: 'Box & packaging', short: 'Box', tagline: 'A box, carton or sleeve on the printer’s dieline.', specialty: 'packaging', example: 'Mailer box for a skincare set' },
+  { id: 'bags', name: 'Bags, pouches & wraps', short: 'Bags', tagline: 'Paper bags, stand-up pouches, wrappers.', specialty: 'packaging', example: 'Stand-up pouch for coffee beans' },
+  { id: 'mockup', name: 'Packaging mockup', short: 'Mockup', tagline: 'A realistic preview before anything is printed.', specialty: 'packaging', example: 'Mockup of our new gift box' },
+  { id: 'flyers', name: 'Flyers & posters', short: 'Flyers', tagline: 'Handouts, posters, table tents.', specialty: 'product-graphics', example: 'A3 poster for our opening week' },
+  { id: 'signage', name: 'Tarpaulin & signage', short: 'Signage', tagline: 'Banners, standees, storefront signs.', specialty: 'product-graphics', example: 'Tarpaulin for a weekend bazaar' },
+  { id: 'menu', name: 'Menu & price list', short: 'Menu', tagline: 'A printed menu, price list or counter card.', specialty: 'product-graphics', example: 'Two-page menu for a café' },
+  { id: 'cards', name: 'Business cards & stationery', short: 'Stationery', tagline: 'Cards, letterhead, thank-you notes.', specialty: 'product-graphics', example: 'Business cards for two partners' },
+  { id: 'invites', name: 'Invitations & event prints', short: 'Invitations', tagline: 'Wedding, debut and party invitations, programs, place cards.', specialty: 'product-graphics', example: 'Invitation suite for a debut' },
+  { id: 'brochure', name: 'Brochure or catalog', short: 'Brochure', tagline: 'A folded leaflet or a product catalog.', specialty: 'product-graphics', example: 'Tri-fold brochure for our services' },
+  { id: 'book', name: 'Book, magazine & yearbook layout', short: 'Layout', tagline: 'Pages set for print: covers, spreads, yearbooks.', specialty: 'product-graphics', example: 'Layout for a 40-page souvenir program' },
+  { id: 'apparel', name: 'T-shirt & merch print', short: 'Merch', tagline: 'Shirt fronts, tote bags, caps, mugs.', specialty: 'product-graphics', example: 'Shirt design for a company fun run' },
+  { id: 'ids', name: 'IDs, lanyards & certificates', short: 'IDs', tagline: 'Company IDs, event badges, awards.', specialty: 'product-graphics', example: 'Employee ID and lanyard set' },
+  { id: 'artwork', name: 'Artwork for a product', short: 'Product artwork', tagline: 'New graphics for something you already sell.', specialty: 'product-graphics', example: 'Holiday edition of our tea tin' },
+  { id: 'other', name: 'Something else', short: 'Design', tagline: 'Describe it below — we’ll route it right.', specialty: 'product-graphics', example: 'Describe what you need' },
+];
+
+/**
  * How a catalog item's size is expressed.
  *
  * Printers quote three-dimensional and flat work differently, so a single

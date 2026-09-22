@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState, useCallback, useEffect, useMemo } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ArrowRight, Check, Clock, Cpu, MapPin, Package, Palette, Printer, ShieldCheck, TrendingUp, Users } from 'lucide-react';
 import { MarketingHeader, MarketingFooter } from '@/components/marketing/Chrome';
 import { Button } from '@/components/ui/Button';
@@ -77,7 +77,10 @@ function categoryIdFor(name: string): string | undefined {
 }
 
 export default function LandingPage() {
-  const { openJoinPartner, profile } = useAuth();
+  const { profile } = useAuth();
+  const navigate = useNavigate();
+  // Joining is a page now, not a sheet.
+  const openJoinPartner = useCallback(() => navigate('/signup?role=partner'), [navigate]);
   const [builderOpen, setBuilderOpen] = useState(false);
   const [initialCategory, setInitialCategory] = useState<string | null>(null);
   const [storyFilter, setStoryFilter] = useState<StoryFilter>('All');

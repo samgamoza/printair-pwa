@@ -8,7 +8,7 @@ import { getPrefs } from './prefs';
  */
 
 const calm = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const INKS = ['#22bdf0', '#ee2a8b', '#ffd21f', '#7352f2', '#33c274', '#f97a1f'];
+const INKS = ['#0094de', '#e6017f', '#f9c101', '#7352f2', '#33c274'];
 
 export function confetti(pieces = 70) {
   if (calm()) return;

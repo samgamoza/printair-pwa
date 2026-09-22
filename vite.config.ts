@@ -117,7 +117,7 @@ export default defineConfig(({ mode }) => ({
         // other alphabets are fetched and kept the first time a page actually uses them), and not
         // the link-preview picture or the home-screen icons, which the phone and social networks fetch
         // for themselves and the running app never draws.
-        globIgnores: ['**/*-{latin-ext,vietnamese,cyrillic,cyrillic-ext,greek,greek-ext}-*.woff2', 'share-card.png', 'icons/**'],
+        globIgnores: ['**/*-{latin-ext,vietnamese,cyrillic,cyrillic-ext,greek,greek-ext}-*.woff2', 'share-card.png', 'icons/**', 'brand/lockup*.png'],
         // Any in-app URL opened offline falls back to the shell, which renders its own offline state.
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/(rest|auth|storage|functions|realtime)\/v1\//],

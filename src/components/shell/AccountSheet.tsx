@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
-import { Building2, ChevronRight, Download, Gift, KeyRound, Languages, LayoutDashboard, LifeBuoy, LogIn, LogOut, Moon, Palette, Printer, Volume2 } from 'lucide-react';
+import { Building2, ChevronRight, Download, Gift, KeyRound, Languages, LayoutDashboard, LifeBuoy, LogIn, LogOut, Moon, Palette, Printer, UserPlus, Volume2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ROLE_HOME, ROLE_DASHBOARD_LABEL } from '@/routes/roles';
 import { requestPasswordReset } from '@/lib/api/auth';
@@ -84,7 +84,7 @@ function Row({
  * even after the banner has been dismissed.
  */
 export function AccountSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { session, profile, openSignIn, openJoinPartner, openJoinDesigner, signOut } = useAuth();
+  const { session, profile, openSignIn, signOut } = useAuth();
   const { toast } = useDialogs();
   const { available, how, install } = useInstall();
   const prefs = usePrefs();
@@ -155,12 +155,25 @@ export function AccountSheet({ open, onClose }: { open: boolean; onClose: () => 
               </>
             ) : (
               <>
+                {/* Two rows, not one. Logging in and signing up are different
+                    errands and the old combined row left people unsure which
+                    one they had just done. */}
                 <Row
                   icon={LogIn}
-                  label="Log in or sign up"
+                  label="Log in"
+                  detail="Already have an account"
                   onClick={() => {
                     onClose();
                     openSignIn();
+                  }}
+                />
+                <Row
+                  icon={UserPlus}
+                  label="Sign up"
+                  detail="New to PrintAir"
+                  onClick={() => {
+                    onClose();
+                    navigate('/signup');
                   }}
                 />
                 <Row
@@ -169,7 +182,7 @@ export function AccountSheet({ open, onClose }: { open: boolean; onClose: () => 
                   detail="Receive matched print projects"
                   onClick={() => {
                     onClose();
-                    openJoinPartner();
+                    navigate('/signup?role=partner');
                   }}
                 />
                 <Row
@@ -178,7 +191,7 @@ export function AccountSheet({ open, onClose }: { open: boolean; onClose: () => 
                   detail="Print-ready design commissions"
                   onClick={() => {
                     onClose();
-                    openJoinDesigner();
+                    navigate('/signup?role=designer');
                   }}
                 />
               </>

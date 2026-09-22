@@ -17,7 +17,7 @@ const CONTACT_EMAIL = 'hello@printair.ph';
  * from the left on hover — the same gesture as the highlighter stroke under "printing." in the hero.
  */
 const NAV_LINK =
-  "relative rounded-full px-3.5 py-2 font-display text-[0.9375rem] font-semibold tracking-[-0.01em] text-ink-800 transition-colors hover:text-ink-950 " +
+  "relative whitespace-nowrap rounded-full px-3.5 py-2 font-display text-[0.9375rem] font-semibold tracking-[-0.01em] text-ink-800 transition-colors hover:text-ink-950 " +
   "after:absolute after:inset-x-3.5 after:bottom-1 after:h-0.5 after:origin-left after:scale-x-0 after:rounded-full after:bg-magenta-500 after:transition-transform after:duration-300 hover:after:scale-x-100 motion-reduce:after:transition-none";
 
 /** Top bar for the two welcome pages. */
@@ -48,7 +48,7 @@ export function MarketingHeader() {
             <Link to="/designers" className={NAV_LINK}>
               Designers
             </Link>
-            <GetAppButton className="ml-2 inline-flex min-h-9 items-center gap-1.5 rounded-full px-3.5 font-display text-[0.9375rem] font-semibold tracking-[-0.01em] text-magenta-700 ring-1 ring-inset ring-magenta-300 transition-colors hover:bg-magenta-50 hover:ring-magenta-400" />
+            <GetAppButton className="ml-2 inline-flex min-h-9 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 font-display text-[0.9375rem] font-semibold tracking-[-0.01em] text-magenta-700 ring-1 ring-inset ring-magenta-300 transition-colors hover:bg-magenta-50 hover:ring-magenta-400" />
           </nav>
           {session && profile ? (
             <>
@@ -82,7 +82,8 @@ export function MarketingHeader() {
 }
 
 export function MarketingFooter() {
-  const { openJoinPartner } = useAuth();
+  const navigate = useNavigate();
+  const openJoinPartner = () => navigate('/signup?role=partner');
   const link = 'block min-h-10 py-2 font-medium text-white/65 transition-colors hover:text-white';
   return (
     <footer className="relative overflow-hidden bg-ink-950 text-white">

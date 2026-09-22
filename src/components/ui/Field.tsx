@@ -1,5 +1,5 @@
-import { useId, type ReactNode, type HTMLInputTypeAttribute } from 'react';
-import type { LucideIcon } from 'lucide-react';
+import { useId, useState, type ReactNode, type HTMLInputTypeAttribute } from 'react';
+import { Eye, EyeOff, type LucideIcon } from 'lucide-react';
 
 function Label({ htmlFor, children, required }: { htmlFor?: string; children: ReactNode; required?: boolean }) {
   return (
@@ -75,21 +75,40 @@ type TextFieldProps = {
   className?: string;
 };
 
-export function TextField({ label, value, onChange, hint, error, required, icon: Icon, className, ...input }: TextFieldProps) {
+export function TextField({ label, value, onChange, hint, error, required, icon: Icon, className, type, ...input }: TextFieldProps) {
   const id = useId();
+  // A password field gets an eye. On a phone keyboard, with no visible
+  // characters, a typo in a new password is otherwise found only at sign-in —
+  // and the rule of thumb is that every password field has one, so it lives in
+  // the kit rather than being remembered per form.
+  const isPassword = type === 'password';
+  const [revealed, setRevealed] = useState(false);
   return (
     <Field label={label} hint={hint} error={error} required={required} htmlFor={id} className={className}>
       <div className="relative">
         {Icon && <Icon className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-ink-400" />}
         <input
           id={id}
+          type={isPassword && revealed ? 'text' : type}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           required={required}
           aria-invalid={error ? true : undefined}
-          className={`control ${Icon ? 'pl-12' : ''} ${error ? 'border-danger-500 focus:border-danger-600' : ''}`}
+          className={`control ${Icon ? 'pl-12' : ''} ${isPassword ? 'pr-12' : ''} ${error ? 'border-danger-500 focus:border-danger-600' : ''}`}
           {...input}
         />
+        {isPassword && (
+          <button
+            type="button"
+            onClick={() => setRevealed((r) => !r)}
+            aria-label={revealed ? 'Hide password' : 'Show password'}
+            aria-pressed={revealed}
+            // 44px square: the touch-target floor from the design system.
+            className="absolute right-1 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full text-ink-400 transition hover:text-ink-900 focus-visible:text-ink-900"
+          >
+            {revealed ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+          </button>
+        )}
       </div>
     </Field>
   );

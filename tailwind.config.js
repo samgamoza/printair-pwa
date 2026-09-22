@@ -29,20 +29,27 @@ const PROCESS = {
   white: { DEFAULT: '#ffffff' },
   ink: { 50: '#f6f5fa', 100: '#eeecf5', 200: '#dfdcea', 300: '#c5c1d6', 400: '#9893b0', 500: '#716b8c', 600: '#565070', 700: '#403b57', 800: '#2a263d', 900: '#19162a', 950: '#0f0d1a' },
   paper: { DEFAULT: '#ffffff', 50: '#ffffff', 100: '#fbfaff', 200: '#f6f5fa', 300: '#eeecf5' },
-  magenta: { 50: '#fff0f7', 100: '#ffe0ef', 200: '#ffc2e0', 300: '#ff94c8', 400: '#fb5aa9', 500: '#ee2a8b', 600: '#d6106f', 700: '#b20a5a', 800: '#8f0c4b', 900: '#5e0a33' },
-  cyan: { 50: '#ebfaff', 100: '#d0f3ff', 200: '#a3e6ff', 300: '#63d4fb', 400: '#22bdf0', 500: '#08a3dc', 600: '#0683b6', 700: '#0a6890', 800: '#0f5573', 900: '#0e3a50' },
-  sun: { 50: '#fffbe6', 100: '#fff5bf', 200: '#ffeb85', 300: '#ffdf47', 400: '#ffd21f', 500: '#f2b900', 600: '#c98f00', 700: '#9a6a04', 800: '#73500a', 900: '#4d360a' },
+  magenta: { 50: '#fdeef7', 100: '#fcddee', 200: '#f8bcdd', 300: '#f389c3', 400: '#ed44a1', 500: '#e6017f', 600: '#bd0168', 700: '#9a0155', 800: '#7f0146', 900: '#55002f' },
+  cyan: { 50: '#edf7fd', 100: '#d4edfa', 200: '#acdcf4', 300: '#6ec2ec', 400: '#2aa5e3', 500: '#0094de', 600: '#007ab7', 700: '#006496', 800: '#00547f', 900: '#003d5c' },
+  sun: { 50: '#fef9e7', 100: '#fef0c2', 200: '#fce38b', 300: '#fbd451', 400: '#facb2b', 500: '#f9c101', 600: '#cfa001', 700: '#a37e01', 800: '#816401', 900: '#5a4500' },
   grape: { 50: '#f3f1ff', 100: '#e8e4ff', 200: '#d3cbff', 300: '#b3a5ff', 400: '#9078fb', 500: '#7352f2', 600: '#5d38dc', 700: '#4c2bb8', 800: '#3d2591', 900: '#2a1b63' },
   leaf: { 50: '#ebfbf1', 100: '#d1f6df', 200: '#a5ecc1', 300: '#6bdb9b', 400: '#33c274', 500: '#16a35a', 600: '#0d8348', 700: '#0d683c', 800: '#0f5232', 900: '#0b3822' },
   danger: { 50: '#fff1f1', 100: '#ffdfdf', 200: '#ffc4c4', 500: '#ef3b45', 600: '#d81f2e', 700: '#b01524' },
 };
 
-/** The original website's tokens, mapped onto this app's palette names. magenta → ember, cyan → teal. */
+/**
+ * The original website's neutrals (warm paper, warm ink) with the brand's own accents.
+ *
+ * Classic used to map magenta → ember orange and cyan → teal, the website's colours, which came
+ * from the old orange "Air". The wordmark is now PRINT in ink and AIR in cyan, magenta, yellow —
+ * there is no orange left in the brand — so Classic keeps its warmth in the neutrals and type
+ * and takes the same magenta and cyan as Process. One brand, two temperatures.
+ */
 const CLASSIC = {
   ink: { 50: '#f7f5f2', 100: '#ebe7e0', 200: '#d6cfc3', 300: '#b8ac9a', 400: '#978873', 500: '#7d6e5b', 600: '#665847', 700: '#54483b', 800: '#463d33', 900: '#322c25', 950: '#1c1714' },
   paper: { DEFAULT: '#fefdfb', 50: '#fefdfb', 100: '#fdfbf7', 200: '#fbf8f3', 300: '#f5f0e8' },
-  magenta: { 50: '#fff8ed', 100: '#ffedd0', 200: '#fed7a0', 300: '#fdba6b', 400: '#fc9a3c', 500: '#f57c14', 600: '#de620a', 700: '#b8490b', 800: '#93390f', 900: '#78300f' },
-  cyan: { 50: '#f0fdfa', 100: '#ccfbf1', 200: '#99f6e4', 300: '#5eead4', 400: '#2dd4bf', 500: '#14b8a6', 600: '#0d9488', 700: '#0f766e', 800: '#115e59', 900: '#134e4a' },
+  magenta: { 50: '#fdeef7', 100: '#fcddee', 200: '#f8bcdd', 300: '#f389c3', 400: '#ed44a1', 500: '#e6017f', 600: '#bd0168', 700: '#9a0155', 800: '#7f0146', 900: '#55002f' },
+  cyan: { 50: '#edf7fd', 100: '#d4edfa', 200: '#acdcf4', 300: '#6ec2ec', 400: '#2aa5e3', 500: '#0094de', 600: '#007ab7', 700: '#006496', 800: '#00547f', 900: '#003d5c' },
 };
 
 /**
@@ -105,7 +112,7 @@ export default {
         card: '0 1px 2px rgba(25,22,42,0.05), 0 14px 36px -14px rgba(25,22,42,0.18)',
         lift: '0 28px 70px -20px rgba(25,22,42,0.38), 0 10px 26px -10px rgba(25,22,42,0.16)',
         pop: '0 10px 0 -4px rgba(25,22,42,0.10)',
-        magenta: '0 14px 30px -10px rgba(238,42,139,0.55)',
+        magenta: '0 14px 30px -10px rgba(230,1,127,0.55)',
         nav: '0 -8px 30px -12px rgba(25,22,42,0.18)',
       },
       backgroundImage: {

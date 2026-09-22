@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Send } from 'lucide-react';
+import { Check, Send } from 'lucide-react';
 import { Sheet } from '@/components/ui/Sheet';
 import { Button } from '@/components/ui/Button';
 import { TextField, TextAreaField, Field } from '@/components/ui/Field';
@@ -7,7 +7,9 @@ import { Dropzone } from '@/components/ui/Dropzone';
 import { FileRow } from '@/components/ui/bits';
 import { FormError } from '@/components/ui/states';
 import { useAuth } from '@/contexts/AuthContext';
-import { DESIGN_SPECIALTIES } from '@/data/catalog';
+import { DESIGN_NEEDS } from '@/data/catalog';
+import { useFlowSkin } from '@/lib/look';
+import { withNeeds, primarySpecialtyFor, describeNeeds, titleForNeeds } from '@/delight/designNeeds';
 import { validateDesignRequestForSubmit } from '@/lib/validation';
 import {
   createDesignRequest,
@@ -31,8 +33,14 @@ import {
  */
 export function DesignRequestBuilder({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { profile } = useAuth();
-  const [title, setTitle] = useState('');
-  const [specialty, setSpecialty] = useState('');
+  // Everything the customer needs, in their words. The one specialty column
+  // gets whichever discipline covers most of the list; the full list rides in
+  // the notes (see delight/designNeeds.ts).
+  const [needs, setNeeds] = useState<string[]>([]);
+  const [otherNeed, setOtherNeed] = useState('');
+  const specialty = primarySpecialtyFor(needs);
+  // No title field: the request is named after its needs ("Logo, Labels & Box").
+  const title = titleForNeeds(needs, otherNeed);
   const [description, setDescription] = useState('');
   const [budgetMin, setBudgetMin] = useState('');
   const [budgetMax, setBudgetMax] = useState('');
@@ -43,8 +51,8 @@ export function DesignRequestBuilder({ open, onClose }: { open: boolean; onClose
   const [busy, setBusy] = useState(false);
 
   function reset() {
-    setTitle('');
-    setSpecialty('');
+    setNeeds([]);
+    setOtherNeed('');
     setDescription('');
     setBudgetMin('');
     setBudgetMax('');
@@ -77,7 +85,22 @@ export function DesignRequestBuilder({ open, onClose }: { open: boolean; onClose
   async function handleSubmit() {
     if (!profile) return;
     setError(null);
-    const errors = validateDesignRequestForSubmit({ title, specialty, description });
+    // The shared validator still asks for a "specialty"; the form asks for
+    // needs. Same check, said the way this screen says it.
+    if (needs.length === 0) {
+      setError('Choose at least one design need.');
+      return;
+    }
+    if (needs.includes('other') && !otherNeed.trim()) {
+      setError('Tell us what else you need designed, or unselect "Something else".');
+      return;
+    }
+    // The backend insists on a description (submit_design_request raises
+    // without one), but the customer no longer has to write it: left blank, the
+    // list of needs they picked stands in. It is the one thing we know for
+    // certain about the job, and a designer can work from it.
+    const briefDescription = description.trim() || describeNeeds(needs, otherNeed);
+    const errors = validateDesignRequestForSubmit({ title, specialty, description: briefDescription });
     if (errors.length) {
       setError(errors[0]);
       return;
@@ -94,11 +117,11 @@ export function DesignRequestBuilder({ open, onClose }: { open: boolean; onClose
         customerId: profile.id,
         title: title.trim(),
         specialty,
-        description: description.trim(),
+        description: briefDescription,
         budgetMin: budgetMin ? Number(budgetMin) : null,
         budgetMax: budgetMax ? Number(budgetMax) : null,
         targetDate: targetDate || null,
-        notes: notes.trim() || null,
+        notes: withNeeds(notes.trim(), needs, otherNeed) || null,
       });
       requestId = request.id;
 
@@ -123,6 +146,10 @@ export function DesignRequestBuilder({ open, onClose }: { open: boolean; onClose
   }
 
   const tiles = ['bg-sun-200', 'bg-cyan-200', 'bg-magenta-200', 'bg-grape-200'];
+  const toggleNeed = (id: string) => setNeeds((list) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id]));
+  // Commissioning a designer is a guided flow like building a print project,
+  // so it wears the same Classic skin (docs/DESIGN-SYSTEM.md, "Skins").
+  const skin = useFlowSkin();
 
   return (
     <Sheet
@@ -131,6 +158,7 @@ export function DesignRequestBuilder({ open, onClose }: { open: boolean; onClose
       labelledBy="design-request-builder-title"
       size="md"
       full
+      skin={skin}
       footer={
         <Button fullWidth size="lg" variant="accent" onClick={handleSubmit} loading={busy} icon={<Send className="h-5 w-5" />}>
           Post to designers
@@ -143,40 +171,58 @@ export function DesignRequestBuilder({ open, onClose }: { open: boolean; onClose
           Commission a designer
         </h2>
         <p className="mt-2 text-ink-600">
-          Tell us what you need designed. Vetted designers matching your specialty will send proposals.
+          Tell us what you need designed. Vetted designers who do this kind of work will send proposals.
         </p>
 
         <div className="mt-7 space-y-5">
-          <TextField label="Title" value={title} onChange={setTitle} placeholder="Logo for a new coffee shop" required />
-
-          <Field label="Specialty" required>
+          <Field label="Design needs" required>
+            <p className="-mt-1 mb-3 text-sm text-ink-600">Choose everything this job needs — one request, one designer for all of it.</p>
             <div className="grid grid-cols-2 gap-2.5">
-              {DESIGN_SPECIALTIES.map((s, i) => {
-                const active = specialty === s.id;
+              {DESIGN_NEEDS.map((n, i) => {
+                const active = needs.includes(n.id);
                 return (
                   <button
-                    key={s.id}
+                    key={n.id}
                     type="button"
-                    onClick={() => setSpecialty(s.id)}
+                    onClick={() => toggleNeed(n.id)}
                     aria-pressed={active}
-                    className={`rounded-3xl p-4 text-left transition-all active:scale-[0.98] ${
+                    data-option
+                    className={`relative rounded-3xl p-3.5 pr-10 text-left transition-all active:scale-[0.98] ${
                       active ? 'bg-ink-950 text-white' : `${tiles[i % tiles.length]} text-ink-950`
                     }`}
                   >
-                    <span className="block font-display text-lg font-bold leading-tight">{s.name}</span>
-                    <span className={`mt-1 block text-sm ${active ? 'text-white/70' : 'text-ink-700'}`}>{s.tagline}</span>
+                    <span className="block font-display text-base font-bold leading-tight">{n.name}</span>
+                    <span data-option-sub className={`mt-1 block text-xs leading-snug ${active ? 'text-white/70' : 'text-ink-700'}`}>{n.tagline}</span>
+                    <span
+                      data-option-tick
+                      aria-hidden="true"
+                      className={`absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full ${active ? 'bg-white text-ink-950' : 'bg-white/60 text-transparent'}`}
+                    >
+                      <Check className="h-3.5 w-3.5" />
+                    </span>
                   </button>
                 );
               })}
             </div>
+            {needs.includes('other') && (
+              <div className="mt-3 animate-fade-up">
+                <TextField
+                  label="What else do you need designed?"
+                  value={otherNeed}
+                  onChange={setOtherNeed}
+                  placeholder="e.g. Hand-lettered menu board, event backdrop"
+                  autoFocus
+                />
+              </div>
+            )}
           </Field>
 
           <TextAreaField
-            label="Description"
-            required
+            label="Description (optional)"
             rows={4}
             value={description}
             onChange={setDescription}
+            hint="Skip it and designers see the needs you picked above."
             placeholder="What is this for, and what should it feel like? Any brand colors or references you already have."
           />
 

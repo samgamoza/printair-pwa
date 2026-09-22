@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Check, CheckCircle2, Lightbulb, Palette, RotateCcw, Save, Send, Sparkles } from 'lucide-react';
 import { Sheet } from '@/components/ui/Sheet';
@@ -642,7 +642,7 @@ const STOCK_SWATCH: Record<string, React.CSSProperties> = {
   'art-card': { background: 'linear-gradient(135deg, #ffffff 0%, #eef1f8 45%, #ffffff 60%, #e3e7f2 100%)' },
   corrugated: { background: 'repeating-linear-gradient(90deg, #d4ad78 0 5px, #b98d55 5px 8px)' },
   'sticker-paper': { background: 'radial-gradient(circle at 78% 22%, #ffffff 0 22%, #f1eee6 23% 100%)' },
-  'sticker-vinyl': { background: 'linear-gradient(135deg, #22bdf0 0%, #7352f2 55%, #ee2a8b 100%)' },
+  'sticker-vinyl': { background: 'linear-gradient(135deg, #2aa5e3 0%, #7352f2 55%, #e6017f 100%)' },
   textured: { background: 'repeating-linear-gradient(0deg, #f4efe4 0 2px, #e8e0cf 2px 3px), #f4efe4' },
 };
 
@@ -827,7 +827,17 @@ function DetailsStep({
         </div>
 
         <DimensionsField shape={dimensionShapeFor(itemId)} value={sizeSpec} onChange={setSizeSpec} />
-        <UnsureField label="Finishing preference" value={finishingPref} onChange={setFinishingPref} placeholder="e.g. matte lamination" />
+        {/* A single-line box with a one-item example read as "pick one", so windows,
+            embossing and foil ended up in Notes where a partner may not look for
+            them. This is the place for everything done to the print after printing. */}
+        <UnsureField
+          label="Finishing and extras"
+          value={finishingPref}
+          onChange={setFinishingPref}
+          rows={2}
+          placeholder="e.g. matte lamination, window, embossing, gold foil stamping"
+          hint="Anything done after printing. List as many as you need."
+        />
 
         <TextField label="Delivery city" value={deliveryCity} onChange={setDeliveryCity} placeholder="e.g. Pasig City" required />
 
@@ -846,7 +856,7 @@ function DetailsStep({
           rows={2}
           value={notes}
           onChange={setNotes}
-          placeholder="Anything else printing partners should know?"
+          placeholder="Anything else — delivery instructions, a past order to match, who to contact."
         />
 
         <Field label="Artwork or reference file (optional)" error={fileError}>
@@ -982,17 +992,24 @@ function UnsureField({
   value,
   onChange,
   placeholder,
+  hint,
+  rows,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
+  hint?: ReactNode;
+  /** Given, the field is a textarea of this many rows: for answers that are a list, not a word. */
+  rows?: number;
 }) {
   const unsure = value === UNSURE;
   return (
-    <Field label={label} action={<UnsureToggle unsure={unsure} onToggle={() => onChange(unsure ? '' : UNSURE)} />}>
+    <Field label={label} hint={hint} action={<UnsureToggle unsure={unsure} onToggle={() => onChange(unsure ? '' : UNSURE)} />}>
       {unsure ? (
         <RecommendNote />
+      ) : rows ? (
+        <textarea rows={rows} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} aria-label={label} className="control resize-y" />
       ) : (
         <input type="text" value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} aria-label={label} className="control" />
       )}
@@ -1026,6 +1043,15 @@ function DimensionsField({
   onChange: (v: string) => void;
 }) {
   const [entryUnit, setEntryUnit] = useState<DimensionUnit>(CANONICAL_UNIT);
+  // What is being typed in each box, kept apart from the stored value.
+  //
+  // The boxes used to show the stored value straight back, and that value is
+  // always a parsed number: type "4." and it is stored as 4, so the box
+  // re-rendered as "4" and the "5" that followed made "45". A decimal could
+  // never be typed. The draft holds the raw keystrokes while a box is being
+  // edited; the stored value still updates on every keystroke, and the draft
+  // is let go once the box loses focus or the unit switches.
+  const [drafts, setDrafts] = useState<Record<number, string>>({});
 
   if (!shape) {
     return <UnsureField label="Size or dimensions" value={value} onChange={onChange} placeholder="e.g. 8 x 8 x 5 in" />;
@@ -1043,10 +1069,18 @@ function DimensionsField({
   const echo = describeInUnit(inches, echoUnit);
 
   const update = (index: number, next: string) => {
+    const typed = sanitizeDimensionInput(next);
+    setDrafts((d) => ({ ...d, [index]: typed }));
     const nextShown = [...shown];
-    nextShown[index] = sanitizeDimensionInput(next);
+    nextShown[index] = typed;
     onChange(composeDimensions(columnToInches(nextShown, entryUnit), axes));
   };
+  const settle = (index: number) =>
+    setDrafts((d) => {
+      const rest = { ...d };
+      delete rest[index];
+      return rest;
+    });
 
   return (
     <Field label="Size or dimensions" action={<UnsureToggle unsure={unsure} onToggle={() => onChange(unsure ? '' : UNSURE)} />}>
@@ -1068,8 +1102,9 @@ function DimensionsField({
                 <input
                   type="text"
                   inputMode="decimal"
-                  value={shown[i] ?? ''}
+                  value={drafts[i] ?? shown[i] ?? ''}
                   onChange={(e) => update(i, e.target.value)}
+                  onBlur={() => settle(i)}
                   placeholder={DIMENSION_PLACEHOLDERS[shape][i]}
                   aria-label={`${axis} in ${entryUnit}`}
                   className="control px-2 text-center font-display text-xl font-bold placeholder:font-sans placeholder:text-base placeholder:font-normal"
@@ -1083,7 +1118,10 @@ function DimensionsField({
                 <button
                   key={u}
                   type="button"
-                  onClick={() => setEntryUnit(u)}
+                  onClick={() => {
+                    setDrafts({});
+                    setEntryUnit(u);
+                  }}
                   aria-pressed={entryUnit === u}
                   className={`min-h-8 rounded-full px-4 text-sm font-bold transition-all ${
                     entryUnit === u ? 'bg-white text-ink-950 shadow-soft' : 'text-ink-500'

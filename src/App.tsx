@@ -22,6 +22,7 @@ const DesignerOrdersPage = lazy(() => import('@/pages/designer/DesignerOrdersPag
 const DesignerProfilePage = lazy(() => import('@/pages/designer/DesignerProfilePage'));
 const LegalPage = lazy(() => import('@/pages/LegalPage'));
 const ResetPasswordPage = lazy(() => import('@/pages/ResetPasswordPage'));
+const SignUpPage = lazy(() => import('@/pages/SignUpPage'));
 const MockCheckoutPage = lazy(() => import('@/pages/checkout/MockCheckoutPage'));
 const CheckoutReturnPage = lazy(() => import('@/pages/checkout/CheckoutReturnPage'));
 const PartnerDirectoryPage = lazy(() => import('@/pages/PartnerDirectoryPage'));
@@ -33,6 +34,8 @@ const ProjectsListPage = lazy(() => import('@/pages/customer/ProjectsListPage'))
 const ProjectDetailPage = lazy(() => import('@/pages/customer/ProjectDetailPage'));
 const DesignRequestsListPage = lazy(() => import('@/pages/customer/DesignRequestsListPage'));
 const DesignRequestDetailPage = lazy(() => import('@/pages/customer/DesignRequestDetailPage'));
+const CustomerProfilePage = lazy(() => import('@/pages/customer/ProfilePage'));
+const CustomerSettingsPage = lazy(() => import('@/pages/customer/SettingsPage'));
 const PartnerLayout = lazy(() => import('@/pages/partner/PartnerLayout'));
 const PartnerHomePage = lazy(() => import('@/pages/partner/PartnerHomePage'));
 const OpportunitiesPage = lazy(() => import('@/pages/partner/OpportunitiesPage'));
@@ -117,6 +120,8 @@ export default function App() {
           <Route path="/privacy" element={<LegalPage doc="privacy" />} />
           <Route path="/terms" element={<LegalPage doc="terms" />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
+          {/* Signing up has its own address, apart from the sign-in sheet. */}
+          <Route path="/signup" element={<SignUpPage />} />
           <Route path="/checkout/mock/:orderId" element={<MockCheckoutPage />} />
           <Route path="/checkout/return" element={<CheckoutReturnPage />} />
           <Route path="/partners" element={<PartnerDirectoryPage />} />
@@ -136,6 +141,8 @@ export default function App() {
             <Route path="projects/:id" element={<ProjectDetailPage />} />
             <Route path="designs" element={<DesignRequestsListPage />} />
             <Route path="designs/:id" element={<DesignRequestDetailPage />} />
+            <Route path="profile" element={<CustomerProfilePage />} />
+            <Route path="settings" element={<CustomerSettingsPage />} />
           </Route>
 
           <Route

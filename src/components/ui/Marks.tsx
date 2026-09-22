@@ -16,7 +16,6 @@
  * On light backgrounds the logo's own orange is too pale to read as text (2.5:1), so the wordmark
  * uses a deeper cut of the same hue there. The artwork itself is never recoloured.
  */
-const LOGO_ORANGE = { onDark: '#f97a1f', onLight: '#d9570a' };
 
 export function PlaneGlyph({ className = 'h-7 w-7' }: { className?: string }) {
   return (
@@ -59,17 +58,19 @@ export function Logo({
   return (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
       <LogoMark className={markClassName} tone={tone} />
-      {/* The wordmark's own face (Unbounded), fixed across both skins — see --font-wordmark in
-          tailwind.config.js. Its cut corners echo the plane's folded paper, which font-display
-          (Bricolage) doesn't. font-weight is set directly rather than with a font-bold utility so it
-          reads correctly at Unbounded's own weight, not Bricolage's. */}
-      <span
+      {/* The owner's wordmark artwork, used as-is (public/brand/). PRINT in ink, AIR in
+          cyan / magenta / yellow — the CMYK the whole brand is built on. The light copy
+          is the same file with the ink turned white, for the dark shell; the colours
+          are untouched in both. Height is set, width follows, so it never distorts.
+          Sized so the letters are about 45% of the mark's height: the artwork is nearly
+          10:1, so every pixel of height is ten of width, and the header has to share. */}
+      <img
         data-wordmark
-        className={`font-wordmark text-[1.3rem] leading-none tracking-tight ${tone === 'light' ? 'text-white' : 'text-ink-950'}`}
-        style={{ fontWeight: 700 }}
-      >
-        Print<span style={{ color: tone === 'light' ? LOGO_ORANGE.onDark : LOGO_ORANGE.onLight }}>Air</span>
-      </span>
+        src={tone === 'light' ? '/brand/wordmark-light.png' : '/brand/wordmark.png'}
+        alt="PrintAir"
+        draggable={false}
+        className="h-4 w-auto select-none"
+      />
     </span>
   );
 }

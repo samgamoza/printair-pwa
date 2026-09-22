@@ -155,9 +155,14 @@ export const TABLES: Record<string, Row[]> = {
   design_payments: [],
   design_reviews: designReviews,
   design_opportunities: designOpps,
+  // Mirrors what the directory rows above say each designer does, so a demo
+  // request reaches the same people it would on the real backend.
   designer_specialties: [
     { designer_id: 'dp1', specialty: 'packaging' },
     { designer_id: 'dp1', specialty: 'label' },
+    { designer_id: 'dp2', specialty: 'logo' },
+    { designer_id: 'dp3', specialty: 'product-graphics' },
+    { designer_id: 'dp3', specialty: 'label' },
   ],
   designer_portfolio_items: [],
   designer_admin_review_queue: reviewQueue,

@@ -14,6 +14,8 @@ import { TABLES, USERS, type Row } from './fixtures';
 const BASE = (import.meta.env.VITE_SUPABASE_URL as string).replace(/\/$/, '');
 const STORAGE_KEY = `sb-${new URL(BASE).hostname.split('.')[0]}-auth-token`;
 export const DEMO_ROLE_KEY = 'printair.demo.role';
+/** Set when someone signed up inside the demo: they exist in TABLES.profiles, not USERS. */
+const DEMO_USER_KEY = 'printair.demo.user';
 const SNAPSHOT_KEY = 'printair.demo.tables';
 
 /**
@@ -73,12 +75,19 @@ function sessionFor(user: Row) {
 }
 
 function currentUser(): Row | null {
+  const signedUp = localStorage.getItem(DEMO_USER_KEY);
+  if (signedUp) {
+    const row = (TABLES.profiles ?? []).find((r) => r.id === signedUp);
+    if (row) return row;
+    localStorage.removeItem(DEMO_USER_KEY);
+  }
   const role = localStorage.getItem(DEMO_ROLE_KEY);
   return role && USERS[role] ? USERS[role] : null;
 }
 
 /** Switches the pretend signed-in person. `null` signs out. */
 export function setDemoRole(role: string | null) {
+  localStorage.removeItem(DEMO_USER_KEY);
   if (role && USERS[role]) {
     localStorage.setItem(DEMO_ROLE_KEY, role);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(sessionFor(USERS[role])));
@@ -196,7 +205,7 @@ function handleRpc(name: string, args: Row): Response {
   const user = currentUser();
   switch (name) {
     case 'email_exists':
-      return json(Object.values(USERS).some((u) => u.email === args.p_email));
+      return json(TABLES.profiles.some((u) => u.email === args.p_email));
 
     // Sample marketplace activity, for the demo only. The real function (docs/BACKEND-FOLLOWUPS.md §6)
     // returns the same shape from real rows, with names already stripped on the server.
@@ -233,6 +242,29 @@ function handleRpc(name: string, args: Row): Response {
         TABLES.design_requests = TABLES.design_requests.filter((r) => r !== request);
       } else {
         request.status = name === 'submit_design_request' ? 'OPEN_FOR_PROPOSALS' : 'CANCELLED';
+      }
+      // The real submit_design_request() fans the request out: one opportunity
+      // per active designer whose specialties include the request's. Without
+      // this, a request posted in the demo never reached anyone's Job Board,
+      // so the customer-to-designer loop could not be clicked through.
+      if (name === 'submit_design_request') {
+        const already = new Set(TABLES.design_opportunities.filter((o) => o.request_id === request.id).map((o) => o.designer_id));
+        for (const ds of TABLES.designer_specialties) {
+          if (ds.specialty !== request.specialty || already.has(ds.designer_id)) continue;
+          const designer = find('designer_profiles', ds.designer_id);
+          if (designer && designer.status !== 'active') continue;
+          TABLES.design_opportunities.push({
+            id: newId('dop'),
+            request_id: request.id,
+            designer_id: ds.designer_id,
+            status: 'NEW',
+            question: null,
+            answer: null,
+            created_at: nowIso(),
+            updated_at: nowIso(),
+          });
+          already.add(ds.designer_id);
+        }
       }
       return json(request);
     }
@@ -360,9 +392,16 @@ function handleRpc(name: string, args: Row): Response {
       return json(null, 204);
     }
 
-    case 'admin_review_designer':
+    case 'admin_review_designer': {
       TABLES.designer_admin_review_queue = TABLES.designer_admin_review_queue.filter((a) => a.id !== args.p_designer_id);
+      const dp = find('designer_profiles', args.p_designer_id);
+      if (dp) {
+        dp.status = typeof args.p_decision === 'string' ? args.p_decision : 'rejected';
+        dp.review_reason = (args.p_reason as string | undefined) ?? null;
+        dp.reviewed_at = nowIso();
+      }
       return json(null, 204);
+    }
 
     default:
       return json(null, 204);
@@ -401,6 +440,14 @@ function handleFunction(name: string, body: Row): Response {
 function handleAuth(path: string, method: string, url: URL, body: Row): Response {
   if (path.startsWith('/auth/v1/token')) {
     if (url.searchParams.get('grant_type') === 'password') {
+      // Someone who signed up in this demo can sign back in as themselves.
+      const signedUp = TABLES.profiles.find((r) => r.email === body.email && !Object.values(USERS).includes(r));
+      if (signedUp) {
+        localStorage.setItem(DEMO_ROLE_KEY, String(signedUp.role));
+        localStorage.setItem(DEMO_USER_KEY, String(signedUp.id));
+        return json(sessionFor(signedUp));
+      }
+      localStorage.removeItem(DEMO_USER_KEY);
       const role = Object.keys(USERS).find((r) => USERS[r].email === body.email) ?? 'customer';
       localStorage.setItem(DEMO_ROLE_KEY, role);
       return json(sessionFor(USERS[role]));
@@ -409,10 +456,86 @@ function handleAuth(path: string, method: string, url: URL, body: Row): Response
     return user ? json(sessionFor(user)) : json({ error: 'invalid_grant' }, 400);
   }
   if (path.startsWith('/auth/v1/signup')) {
+    // Mirrors the backend's signup trigger: a profile for everyone, plus a
+    // partner profile or a pending designer profile (and its place in the
+    // admin review queue). The person is then signed in as themselves, so
+    // the admin side of the demo has someone new to look at. Before this,
+    // signing up silently made you the fixture for that role.
     const meta = ((body.data as Row | undefined) ?? {}) as Row;
     const role = typeof meta.role === 'string' && USERS[meta.role] ? meta.role : 'customer';
+    const email = String(body.email ?? '');
+    if (TABLES.profiles.some((r) => r.email === email)) {
+      return json({ code: 'user_already_exists', message: 'User already registered' }, 422);
+    }
+    const str = (k: string) => (typeof meta[k] === 'string' ? (meta[k] as string).trim() : '');
+    const fullName =
+      role === 'customer' ? `${str('first_name')} ${str('last_name')}`.trim() : role === 'partner' ? str('contact_name') : str('display_name');
+    const user: Row = {
+      id: newId('u'),
+      role,
+      full_name: fullName || email,
+      email,
+      mobile: str('mobile') || null,
+      city: str('city') || null,
+      avatar_url: null,
+      status: 'active',
+      created_at: nowIso(),
+    };
+    TABLES.profiles.push(user);
+    if (role === 'partner') {
+      TABLES.partner_profiles.push({
+        id: newId('pp'),
+        user_id: user.id,
+        business_name: str('business_name'),
+        contact_name: str('contact_name'),
+        city: str('city'),
+        description: null,
+        typical_turnaround_days: null,
+        service_areas: [],
+        services: Array.isArray(meta.services) ? meta.services : [],
+        logo_url: null,
+        portfolio_images: [],
+        status: 'active',
+        created_at: nowIso(),
+      });
+    }
+    if (role === 'designer') {
+      const specialties = Array.isArray(meta.specialties) ? (meta.specialties as string[]) : [];
+      const dp: Row = {
+        id: newId('dp'),
+        user_id: user.id,
+        display_name: str('display_name'),
+        city: str('city'),
+        bio: str('bio') || null,
+        application_note: str('application_note') || null,
+        typical_turnaround_days: null,
+        rate_min: null,
+        rate_max: null,
+        avatar_url: null,
+        status: 'pending_review',
+        review_reason: null,
+        reviewed_at: null,
+        created_at: nowIso(),
+      };
+      TABLES.designer_profiles.push(dp);
+      for (const sp of specialties) TABLES.designer_specialties.push({ designer_id: dp.id, specialty: sp });
+      TABLES.designer_admin_review_queue.push({
+        id: dp.id,
+        display_name: dp.display_name,
+        city: dp.city,
+        bio: dp.bio,
+        application_note: dp.application_note,
+        specialties,
+        applied_at: nowIso(),
+        portfolio_count: 0,
+        flag_low_sample_count: true,
+        flag_bad_format: false,
+        flag_low_resolution: false,
+      });
+    }
     localStorage.setItem(DEMO_ROLE_KEY, role);
-    return json(sessionFor(USERS[role]));
+    localStorage.setItem(DEMO_USER_KEY, String(user.id));
+    return json(sessionFor(user));
   }
   if (path.startsWith('/auth/v1/logout')) {
     localStorage.removeItem(DEMO_ROLE_KEY);

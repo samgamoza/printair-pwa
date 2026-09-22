@@ -128,3 +128,20 @@ grant execute on function public.public_activity() to anon, authenticated;
 The front end already drops anything that is not one of the three kinds, is older than 48 hours or is dated in the future, so a mistake here shows nothing rather than something wrong.
 
 **Later, if wanted.** Supabase Realtime could push new events to open pages instead of one fetch per visit. Not needed for the effect, and it would mean a public broadcast channel to secure.
+
+## 7. Design requests with more than one need
+
+The customer-facing form now asks for **design needs** (logo, labels, box, mockup, flyers, menu…) and lets the customer pick as many as the job has — a new product usually wants a logo, its labels and its box together. See `DESIGN_NEEDS` in `src/data/catalog.ts`; each need maps to one of the four designer specialties.
+
+What the front end does today, with no backend change:
+
+- `design_requests.specialty` gets the specialty that covers the most of what was picked (`primarySpecialtyFor` in `src/delight/designNeeds.ts`).
+- The full list travels as one labelled line at the end of `notes` — `Design needs: Logo & brand mark · Labels & stickers · Box & packaging.` — the same way the project builder carries the budget. Designers read notes, so nothing is lost; it is just not queryable.
+
+What the backend would add:
+
+1. A `design_request_needs (request_id, need text)` table, or a `needs text[]` column on `design_requests`, written by `createDesignRequest`.
+2. The fan-out in `20260810000300_designer_marketplace_functions.sql` (the `WHERE ds.specialty = NEW.specialty` at line ~149) matching on **any** specialty the needs map to, so a logo-plus-box request reaches logo designers as well as packaging designers instead of only the primary.
+3. `readNeeds` / `withNeeds` then become unnecessary and the line can stop being written.
+
+Until then, a request reaches designers of its primary specialty only. Worth doing before there are enough designers for the difference to show.

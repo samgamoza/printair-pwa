@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, Suspense } from 'react';
 import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowRight, FolderKanban, Palette, Printer } from 'lucide-react';
+import { ArrowRight, FolderKanban, Palette, Printer, Settings, UserRound } from 'lucide-react';
 import { AppShell, type ShellNavItem } from '@/components/shell/AppShell';
 import { Sheet } from '@/components/ui/Sheet';
 import { ProjectBuilder } from '@/components/ProjectBuilder';
@@ -12,6 +12,10 @@ import { PageLoader } from '@/components/ui/states';
 const NAV: ShellNavItem[] = [
   { to: '/dashboard', label: 'My Projects', short: 'Projects', icon: FolderKanban, end: true },
   { to: '/dashboard/designs', label: 'My Designs', short: 'Designs', icon: Palette },
+  // Past maxTabs these fall into the shell's "More" sheet on a phone, which is
+  // where account screens belong anyway — they are visited rarely.
+  { to: '/dashboard/profile', label: 'My Profile', short: 'Profile', icon: UserRound },
+  { to: '/dashboard/settings', label: 'Settings', short: 'Settings', icon: Settings },
 ];
 
 /**
