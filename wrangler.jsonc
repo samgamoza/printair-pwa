@@ -13,6 +13,11 @@
   // so an installed app is never pinned to an old version.
   "name": "printair-pwa",
   "compatibility_date": "2026-09-22",
+  // The app's address. Declared here rather than in the dashboard so it travels with the code:
+  // every deploy attaches it, and it cannot end up bound to a different project by accident.
+  // Cloudflare creates the DNS record and the certificate itself on the first deploy. The
+  // guma.one zone must be on this Cloudflare account, and nothing else may already hold the name.
+  "routes": [{ "pattern": "printair.guma.one", "custom_domain": true }],
   "assets": {
     "directory": "./dist",
     "not_found_handling": "single-page-application"
