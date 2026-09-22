@@ -1,9 +1,10 @@
 // Generates the in-app logo and every app icon from the brand mark. Run with `npm run icons`.
 //
 // Source: brand/printair-mark-source.png — the PrintAir paper plane, used exactly as supplied.
-// The supplied file has a grey-and-white "transparency" checkerboard painted into it rather than
-// real transparency, so the only processing is to make that backdrop genuinely transparent.
-// The artwork itself (shapes, colours, gradients) is not redrawn, recoloured or reshaped.
+// The current source (the CMYK plane with its motion lines and glow) has real transparency, so
+// the backdrop-lifting step below finds nothing to lift and passes it through; it is kept for
+// the case where a future source is painted onto a white or checkerboard backdrop again.
+// The artwork itself (shapes, colours, gradients, the glow) is not redrawn, recoloured or reshaped.
 import sharp from 'sharp';
 import { mkdir } from 'node:fs/promises';
 
@@ -97,9 +98,9 @@ await Promise.all([
   icon('icons/favicon-32.png', { size: 32, pad: 0.04, radius: 0.22 }),
   icon('icons/favicon-64.png', { size: 64, pad: 0.04, radius: 0.22 }),
   // Home-screen shortcut icons.
-  png(glyph({ bg: '#ee2a8b', draw: '<path d="M48 26v44M26 48h44" stroke="#fff" stroke-width="9" stroke-linecap="round"/>' }), 'icons/shortcut-new.png'),
-  png(glyph({ bg: '#22bdf0', draw: '<rect x="24" y="30" width="48" height="38" rx="7" fill="none" stroke="#0f0d1a" stroke-width="7"/><path d="M24 42h48" stroke="#0f0d1a" stroke-width="7"/>' }), 'icons/shortcut-projects.png'),
-  png(glyph({ bg: '#ffd21f', draw: '<path d="M24 38l24-12 24 12v26a6 6 0 0 1-6 6H30a6 6 0 0 1-6-6z" fill="none" stroke="#0f0d1a" stroke-width="7" stroke-linejoin="round"/><path d="M24 40l24 14 24-14" fill="none" stroke="#0f0d1a" stroke-width="7" stroke-linejoin="round"/>' }), 'icons/shortcut-opps.png'),
+  png(glyph({ bg: '#e6017f', draw: '<path d="M48 26v44M26 48h44" stroke="#fff" stroke-width="9" stroke-linecap="round"/>' }), 'icons/shortcut-new.png'),
+  png(glyph({ bg: '#0094de', draw: '<rect x="24" y="30" width="48" height="38" rx="7" fill="none" stroke="#0f0d1a" stroke-width="7"/><path d="M24 42h48" stroke="#0f0d1a" stroke-width="7"/>' }), 'icons/shortcut-projects.png'),
+  png(glyph({ bg: '#f9c101', draw: '<path d="M24 38l24-12 24 12v26a6 6 0 0 1-6 6H30a6 6 0 0 1-6-6z" fill="none" stroke="#0f0d1a" stroke-width="7" stroke-linejoin="round"/><path d="M24 40l24 14 24-14" fill="none" stroke="#0f0d1a" stroke-width="7" stroke-linejoin="round"/>' }), 'icons/shortcut-opps.png'),
 ]);
 
 console.log('Logo written to public/logo-mark.png; icons to public/ and public/icons/');
