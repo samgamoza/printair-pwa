@@ -1,0 +1,20 @@
+{
+  // Cloudflare Workers static-assets deploy for the built Vite app.
+  //
+  // The name must match the Worker that Workers Builds created from this repo, or
+  // `wrangler deploy` makes a second one. There is no `main`: this Worker is assets
+  // only, no server code.
+  //
+  // `not_found_handling` is what makes react-router-dom work on a hard refresh — an
+  // address with no matching file serves index.html instead of 404ing. public/_redirects
+  // says the same thing and is still read; either alone is enough.
+  //
+  // public/_headers keeps its no-cache rules on the service worker and the manifest,
+  // so an installed app is never pinned to an old version.
+  "name": "printair-pwa",
+  "compatibility_date": "2026-09-22",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  }
+}
