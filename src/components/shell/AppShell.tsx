@@ -153,7 +153,7 @@ export function AppShell({
         <div className="pt-safe">
           <div className="flex h-14 items-center justify-between px-5">
             <Link to="/">
-              <Logo markClassName="h-8 w-8" />
+              <Logo size="h-10" />
             </Link>
             <button type="button" onClick={() => setAccountOpen(true)} aria-label="Account" className="rounded-full active:scale-95">
               <Avatar name={name} className="h-9 w-9 text-xs" />

@@ -40,7 +40,7 @@ export function PublicShell({
               <ArrowLeft className="h-5 w-5" />
             </button>
             <Link to="/" className="mr-auto">
-              <Logo markClassName="h-8 w-8" />
+              <Logo size="h-10" />
             </Link>
             <button type="button" onClick={() => setAccountOpen(true)} aria-label="Account" className="rounded-full active:scale-95">
               {session && profile ? (

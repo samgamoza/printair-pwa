@@ -1,8 +1,13 @@
 /**
  * Brand marks and print-shop ornaments.
  *
- * The logo is PrintAir's own artwork, used exactly as supplied: the CMYK paper
- * plane with its motion lines, and the PRINTAIR wordmark. `npm run icons` cuts
+ * The logo is PrintAir's own artwork, used exactly as supplied. `Logo` is the
+ * owner's single lockup file — plane and PRINTAIR together, at the spacing they
+ * were drawn with, which is why it is one image and not two the app has to space
+ * itself. `LogoMark` is the plane alone, for the few places that show no name.
+ * The full lockup with the "PRINT. DELIVERED." tagline lives in public/brand/:
+ * its tagline is 7% of the artwork's height, so it needs a surface far taller
+ * than a header row before it can be read. `npm run icons` cuts
  * the plane from `brand/printair-mark-source.png` into `src/assets/brand/` (what
  * the app renders) and `public/` (favicon, home-screen icons, manifest).
  *
@@ -21,8 +26,8 @@
  * The ornaments further down are drawn in code so they stay crisp at any size.
  */
 import logoMark from '@/assets/brand/logo-mark.png';
-import wordmark from '@/assets/brand/wordmark.png';
-import wordmarkLight from '@/assets/brand/wordmark-light.png';
+import lockupOnLight from '@/assets/brand/lockup.png';
+import lockupOnDark from '@/assets/brand/lockup-light.png';
 
 export function PlaneGlyph({ className = 'h-7 w-7' }: { className?: string }) {
   return (
@@ -48,29 +53,28 @@ export function LogoMark({ className = 'h-10 w-10' }: { className?: string }) {
 export function Logo({
   className = '',
   tone = 'dark',
-  markClassName = 'h-9 w-9',
+  size = 'h-12',
 }: {
   className?: string;
   tone?: 'dark' | 'light';
-  markClassName?: string;
+  /**
+   * The lockup's height. Width follows, so it can never be squashed.
+   *
+   * The height is the whole artwork, glow included, and the glow is roughly a
+   * third of it — so PRINTAIR itself reads about a third of whatever is set
+   * here. That is why these numbers are a notch larger than they look: h-12
+   * puts the name at the same 16px it has always been.
+   */
+  size?: string;
 }) {
   return (
-    <span className={`inline-flex items-center gap-2.5 ${className}`}>
-      <LogoMark className={markClassName} />
-      {/* The owner's wordmark artwork, used as-is (src/assets/brand/). PRINT in ink, AIR in
-          cyan / magenta / yellow — the CMYK the whole brand is built on. The light copy
-          is the same file with the ink turned white, for the dark shell; the colours
-          are untouched in both. Height is set, width follows, so it never distorts.
-          Sized so the letters are about 45% of the mark's height: the artwork is nearly
-          10:1, so every pixel of height is ten of width, and the header has to share. */}
-      <img
-        data-wordmark
-        src={tone === 'light' ? wordmarkLight : wordmark}
-        alt="PrintAir"
-        draggable={false}
-        className="h-4 w-auto select-none"
-      />
-    </span>
+    <img
+      data-wordmark
+      src={tone === 'light' ? lockupOnDark : lockupOnLight}
+      alt="PrintAir"
+      draggable={false}
+      className={`w-auto select-none ${size} ${className}`}
+    />
   );
 }
 
